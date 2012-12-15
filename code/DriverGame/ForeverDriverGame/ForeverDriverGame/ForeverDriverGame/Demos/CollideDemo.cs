@@ -113,13 +113,11 @@ namespace Forever.Demos
                 0f
                 ));
              
-           // Together();
 
 
             this.AddEntity(EntityOne);
             this.AddEntity(EntityTwo);
 
-            //ConstantPull();
             LoadBackground();
 
             CamBody.Position = new Vector3(0f, 10f, 20f);

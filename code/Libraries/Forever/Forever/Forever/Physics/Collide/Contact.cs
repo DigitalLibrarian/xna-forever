@@ -285,8 +285,8 @@ namespace Forever.Physics.Collide
                     // data. Otherwise the resolution will not change the position
                     // of the object, and the next collision detection round will
                     // have the same penetration.
-                    //RigidBody bodyB = body as RigidBody;
-                    //bodyB.calculateDerivedData();
+                    RigidBody bodyB = body as RigidBody;
+                    bodyB.calculateDerivedData();
                 }
             }
         }
