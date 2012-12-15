@@ -25,8 +25,7 @@ namespace Forever.Demos
             ScreenState = ScreenState.NoTransitions;
             PropagateDraw = true;
 
-           // TransitionOnTime = TimeSpan.FromSeconds(0.2);
-            //TransitionOffTime = TimeSpan.FromSeconds(0.2);
+
         }
 
 
@@ -65,8 +64,6 @@ namespace Forever.Demos
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             SpriteFont font = spriteFont;
 
-            // Darken down any other screens that were drawn beneath the popup.
-            //ScreenManager.FadeBackBufferToBlack(TransitionAlpha * 2 / 3);
 
 
             Vector2 textSize = font.MeasureString(message);
@@ -81,8 +78,7 @@ namespace Forever.Demos
                                                           (int)textSize.X + hPad * 2,
                                                           (int)textSize.Y + vPad * 2);
 
-            // Fade the popup alpha during transitions.
-            Color color = new Color(255, 255, 255, TransitionAlpha);
+            Color color = new Color(255, 255, 255);
 
             spriteBatch.Begin();
 
