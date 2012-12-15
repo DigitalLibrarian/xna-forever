@@ -162,9 +162,9 @@ namespace Forever.GameEntities
 
             }
 
-           
 
 
+            renderContext.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             foreach (EffectPass pass in quadEffect.CurrentTechnique.Passes)
             {
 

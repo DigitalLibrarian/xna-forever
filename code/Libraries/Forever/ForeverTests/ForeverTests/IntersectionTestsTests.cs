@@ -673,50 +673,6 @@ namespace ForeverTests
 
 
 
-        [Test]
-        [Ignore("Working on replacing the box vs box collision and this is in volatile state atm.")]
-        public void IntersectionTests_BoxVsBox_Corners()
-        {
-            // For this set of tests, the left box will always be centered at origin
-            
-            float expectedPenetration = 0.1f;
-            //intersect at +,+,+
-
-            Vector3 leftPos = Vector3.Zero;
-            IRigidBody leftBody = new NoBody(Matrix.CreateTranslation(leftPos));
-            Box left = new Box(leftBody, Matrix.Identity, new Vector3(1f, 1f, 1f));
-
-
-            Vector3 rightPos = new Vector3(1.9f, 1.9f, 1.9f);
-            IRigidBody rightBody = new NoBody(Matrix.CreateTranslation(rightPos));
-            Box right = new Box(rightBody, Matrix.Identity, new Vector3(1f, 1f, 1f));
-
-            CollisionData data = new CollisionData();
-            int contactsFound = IntersectionTests.boxAndBox(left, right, data);
-
-            Assert.AreEqual(1, contactsFound);
-
-            Assert.True(TrickyMathHelper.AlmostEquals(expectedPenetration, data.contacts[0].Penetration));
-            Assert.AreEqual(new Vector3(1f, 1f, 1f), data.contacts[0].Point);
-            Assert.AreEqual(Vector3.Right, data.contacts[0].Normal);
-
-
-            //intersect at -,+,+
-            rightPos = new Vector3(-1.9f, +1.9f, +1.9f);
-            right = new Box(rightBody, Matrix.Identity, new Vector3(1f, 1f, 1f));
-
-            data = new CollisionData();
-            contactsFound = IntersectionTests.boxAndBox(left, right, data);
-
-            Assert.AreEqual(1, contactsFound);
-
-            Assert.True(TrickyMathHelper.AlmostEquals(expectedPenetration, data.contacts[0].Penetration));
-            Assert.AreEqual(new Vector3(1f, 1f, 1f), data.contacts[0].Point);
-            Assert.AreEqual(Vector3.Right, data.contacts[0].Normal);
-
-
-
-        }
 
         //////////////////////////////////////////////////////////////////////////////////////////
 

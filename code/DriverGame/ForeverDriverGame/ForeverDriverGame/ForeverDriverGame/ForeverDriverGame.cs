@@ -55,7 +55,7 @@ namespace ForeverDriverGame
 
         // Some assignable names for arbitrary assignnment
         [EntityInspector("X:")]
-        string X { get; set; }
+        object X { get; set; }
         
         [EntityInspector("Bag")]
         object[] Bag;
@@ -266,7 +266,7 @@ namespace ForeverDriverGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             Set3DRenderStates();
             base.Draw(gameTime);

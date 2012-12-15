@@ -32,8 +32,8 @@ namespace ForeverTests
 
             contact.ReCalc(1f);
 
-            Assert.AreEqual(Vector3.Right, contact.BodyCenters[0]);
-            Assert.AreEqual(Vector3.Left * 0.9f, contact.BodyCenters[1]);
+            Assert.AreEqual(Vector3.Right, contact.RelativeContactPositions[0]);
+            Assert.AreEqual(Vector3.Left * 0.9f, contact.RelativeContactPositions[1]);
 
             
         }

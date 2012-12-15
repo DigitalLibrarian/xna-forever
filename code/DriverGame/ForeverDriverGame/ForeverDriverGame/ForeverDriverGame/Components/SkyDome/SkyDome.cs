@@ -109,12 +109,12 @@ namespace Forever.Demos.Components.SkyDome
 
             if (realTime)
             {
-                int minutes = DateTime.Now.Hour * 60 + DateTime.Now.Minute;
+                int minutes = DateTime.Now.Minute * 60 + DateTime.Now.Second;
 
-                minutes = DateTime.Now.Second * 60  + (DateTime.Now.Millisecond * 6 / 100 );
+                //minutes = DateTime.Now.Minute * 60  + DateTime.Now.Second ;
 
                 // break the day up into <num minutes in a day> equal sections and map to the correct angle based upon the date information
-                this.fTheta = (float)minutes * (float)(Math.PI) / 12.0f / 60.0f;
+                this.fTheta = (float)minutes * (float)(Math.PI) / 60f / 60f ;
             }
 
             parameters.LightDirection = this.GetDirection();

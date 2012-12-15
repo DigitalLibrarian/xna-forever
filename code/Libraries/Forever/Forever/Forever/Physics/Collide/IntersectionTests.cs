@@ -313,6 +313,8 @@ namespace Forever.Physics.Collide
             if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(2), two.getAxis(1)), toCenter, 13, ref pen, ref best)) return 0;
             if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(2), two.getAxis(2)), toCenter, 14, ref pen, ref best)) return 0;
 
+
+
             if (best == int.MaxValue)
             {
                 throw new Exception("Found no good axis"); 
@@ -345,24 +347,32 @@ namespace Forever.Physics.Collide
                 Vector3 twoAxis = two.getAxis(twoAxisIndex);
                 Vector3 axis = TrickyMathHelper.VectorProduct(oneAxis, twoAxis);
                 axis.Normalize();
-                if(Vector3.Dot(axis, toCenter) > 0){
-                    axis  *= -1f;
+                if (Vector3.Dot(axis, toCenter) > 0)
+                {
+                    axis *= -1f;
                 }
 
                 float[] ptOnOneEdge = TrickyMathHelper.Vector3ToFloatArray(one.HalfSizes);
                 float[] ptOnTwoEdge = TrickyMathHelper.Vector3ToFloatArray(two.HalfSizes);
 
-                for(int i = 0; i < 3; i++){
-                    if(i == oneAxisIndex){
+                for (int i = 0; i < 3; i++)
+                {
+                    if (i == oneAxisIndex)
+                    {
                         ptOnOneEdge[i] = 0f;
-                    }else if(Vector3.Dot(one.getAxis(i), axis) > 0){
+                    }
+                    else if (Vector3.Dot(one.getAxis(i), axis) > 0)
+                    {
                         ptOnOneEdge[i] *= -1f;
                     }
 
-                    if(i == twoAxisIndex){
-                        ptOnTwoEdge[0] = 0;
-                    }else if(Vector3.Dot(two.getAxis(i), axis) < 0){
-                        ptOnTwoEdge[i]  *= -1f;
+                    if (i == twoAxisIndex)
+                    {
+                        ptOnTwoEdge[i] = 0;
+                    }
+                    else if (Vector3.Dot(two.getAxis(i), axis) < 0)
+                    {
+                        ptOnTwoEdge[i] *= -1f;
                     }
                 }
 
@@ -370,12 +380,12 @@ namespace Forever.Physics.Collide
                                                TrickyMathHelper.FloatArrayToVector3(ptOnOneEdge),
                                                one.Transform
                                                );
-                
+
                 Vector3 vertexOnTwoEdge = Vector3.Transform(
                                                TrickyMathHelper.FloatArrayToVector3(ptOnTwoEdge),
                                                two.Transform
                                                );
-        
+
                 float[] oneHalfSizes = TrickyMathHelper.Vector3ToFloatArray(one.HalfSizes);
                 float[] twoHalfSizes = TrickyMathHelper.Vector3ToFloatArray(two.HalfSizes);
                 Vector3 vertex = contactPoint(
@@ -460,17 +470,20 @@ namespace Forever.Physics.Collide
 
 
             Vector3 vertex = two.HalfSizes;
-            if (Vector3.Dot(two.getAxis(0), normal) < 0)
+            float oneDot = Vector3.Dot(two.getAxis(0), normal);
+            if (oneDot < 0)
             {
                 vertex *= new Vector3(-1f, 0f, 0f);
             }
 
-            if (Vector3.Dot(two.getAxis(1), normal) < 0)
+            float twoDot = Vector3.Dot(two.getAxis(1), normal);
+            if (twoDot < 0)
             {
                 vertex *= new Vector3(0f, -1f, 0f);
             }
 
-            if (Vector3.Dot(two.getAxis(2), normal) < 0)
+            float threeDot = Vector3.Dot(two.getAxis(2), normal);
+            if (threeDot < 0)
             {
                 vertex *= new Vector3(0f, 0f, -1f);
             }

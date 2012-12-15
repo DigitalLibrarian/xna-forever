@@ -49,10 +49,11 @@ namespace Forever.Demos
             DefaultSphereMass = 1f;
             DefaultSphereRadius = 1f;
 
-            DefaultSpawnPosOne = new Vector3(-DefaultSphereRadius * 3.5f, 10f, 0f);
-            DefaultSpawnPosTwo = new Vector3(DefaultSphereRadius * 3.5f, 10f, 0f);
+            DefaultSpawnPosOne = new Vector3(-DefaultSphereRadius * 3.51f, 10.001f, 0.001f);
+            DefaultSpawnPosTwo = new Vector3(DefaultSphereRadius * 3.51f, 10.001f, 0.001f);
+
            
-            DefaultRestitution = 0.1f;
+            DefaultRestitution = 1f;
             LastContact = new Contact();
             this.ContactsPerFrame = 10;
 
@@ -89,21 +90,29 @@ namespace Forever.Demos
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-            EntityOne.Body.AngularDamping = 0.999f;
+            //EntityOne.Body.AngularDamping = 0.999f;
             EntityOne.Body.LinearDamping = 0.9999f;
-            EntityTwo.Body.AngularDamping = 0.999f;
+            //EntityTwo.Body.AngularDamping = 0.999f;
             EntityTwo.Body.LinearDamping = 0.9999f;
 
 
             EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
             EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.001f));
-
-
+            
+            
             EntityOne.addForce(new Vector3(
                 0.00001f, 
-                -0.0000005f, 
+                0.0000005f, 
                 0f
                 ));
+
+
+            EntityTwo.addForce(new Vector3(
+                -0.00001f,
+                -0.0000005f,
+                0f
+                ));
+             
            // Together();
 
 
@@ -208,7 +217,7 @@ namespace Forever.Demos
             int midPoint = this.ICollideables.Count / 2;
 
             IEnumerable<ICollideable> gameObjectsLeft = colliders;
-            IEnumerable<ICollideable> gameObjectsRight = colliders.Skip(midPoint);
+            IEnumerable<ICollideable> gameObjectsRight = colliders;
 
             CollisionDetector detect = new CollisionDetector();
             List<Contact> contacts = new List<Contact>();

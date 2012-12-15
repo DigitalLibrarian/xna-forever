@@ -14,8 +14,8 @@ namespace Forever.Physics.Collide
     {
         public float PenetrationEpsilon = 0.00025f;
         public float VelocityEpisilon = 0.00001f;
-        public int PositionIterations = 100;
-        public int VelocityIterations = 1;
+        public int PositionIterations = 25;
+        public int VelocityIterations = 2;
 
 
 
@@ -77,7 +77,7 @@ namespace Forever.Physics.Collide
                                 {
                                     
                                     deltaPosition = linearChange[d] 
-                                        + TrickyMathHelper.VectorProduct(angularChange[d], contact.BodyCenters[b]);
+                                        + TrickyMathHelper.VectorProduct(angularChange[d], contact.RelativeContactPositions[b]);
                                        
                                     contact.Penetration += TrickyMathHelper.ScalarProduct(deltaPosition, contact.Normal  ) * (b == 0 ? -1f : 1f);
                                 }
@@ -125,7 +125,7 @@ namespace Forever.Physics.Collide
                                 {
 
                                     deltaVel = velocityChange[d]
-                                        + TrickyMathHelper.VectorProduct(rotationChange[d], contact.BodyCenters[b]);
+                                        + TrickyMathHelper.VectorProduct(rotationChange[d], contact.RelativeContactPositions[b]);
 
                                     contact.ContactVelocity +=
                                         Vector3.Transform(deltaVel, Matrix.Transpose(contact.ContactWorld)) * (b == 0 ? -1 : 1);

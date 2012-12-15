@@ -64,7 +64,7 @@ namespace Forever.Physics.Collide
           Vector3 v = axis[index];
           if (v.Length() != 0)
           {
-              v.Normalize();
+              //v.Normalize();
           }
           return axis[index];
       }
@@ -73,7 +73,6 @@ namespace Forever.Physics.Collide
     public Primitive(IRigidBody b, Vector3 off)
     {
       body = b;
-      //just plowing a path for planes
     }
 
     public Primitive(IRigidBody b, Matrix off)
@@ -118,14 +117,16 @@ namespace Forever.Physics.Collide
 
     }
 
+      // TODO - unit test
+    /// <summary>
+    /// Project the given point in world coordinates to the nearest point on the plane in world coordinates
+    /// </summary>
+    /// <param name="w_point"></param>
+    /// <returns></returns>
     public Vector3 ClosestPoint(Vector3 w_point)
     {
-
         float dist = Vector3.Dot(Normal, w_point + (normal * Offset));
         return w_point - (dist * Normal);
-
-      //float d = Vector3.Dot(normal, w_point - (normal * Offset));
-      //return w_point - (normal * d);
     }
   }
 
