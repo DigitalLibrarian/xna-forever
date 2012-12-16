@@ -11,18 +11,18 @@ namespace ForeverTests
     public class ContactTests
     {
         [Test]
-        public void Contact_RelativeBodyCenters()
+        public void Contact_XAxis()
         {
+            NoBody bodyZero = new NoBody();
+            bodyZero.Position = Vector3.Right;
+            bodyZero.Velocity = Vector3.Left;
             NoBody bodyOne = new NoBody();
-            bodyOne.Position = Vector3.Right;
-            bodyOne.Velocity = Vector3.Left;
-            NoBody bodyTwo = new NoBody();
-            bodyTwo.Position = Vector3.Left * .9f;
-            bodyTwo.Velocity = Vector3.Right;
+            bodyOne.Position = Vector3.Left * .9f;
+            bodyOne.Velocity = Vector3.Right;
 
             Contact contact = new Contact();
-            contact.Bodies[0] = bodyOne;
-            contact.Bodies[1] = bodyTwo;
+            contact.Bodies[0] = bodyZero;
+            contact.Bodies[1] = bodyOne;
 
             contact.Point = Vector3.Zero;
             contact.Penetration = 0.1f;
@@ -32,10 +32,68 @@ namespace ForeverTests
 
             contact.ReCalc(1f);
 
+            Assert.AreEqual(Vector3.Left, contact.CalcLocalVelocity(0, 1f));
+            Assert.AreEqual(Vector3.Right, contact.CalcLocalVelocity(1, 1f));
+
             Assert.AreEqual(Vector3.Right, contact.RelativeContactPositions[0]);
             Assert.AreEqual(Vector3.Left * 0.9f, contact.RelativeContactPositions[1]);
+            Assert.AreEqual(new Vector3(-2f, 0f, 0f), contact.ContactVelocity);
 
-            
+
+            // Position Change
+
+            Vector3[] linearChange = new Vector3[2];
+            Vector3[] angularChange = new Vector3[2];
+            contact.ApplyPositionChange(
+                ref linearChange, ref angularChange, contact.Penetration);
+
+            Assert.AreEqual(Vector3.Zero, angularChange[0], "Zero angular change for object 0");
+            Assert.AreEqual(Vector3.Zero, angularChange[1], "Zero angular change for object 1");
+
+            Assert.AreEqual(new Vector3(0.05f, 0f, 0f), linearChange[0],
+                "Body 0 is pushed right by half penetration");
+            Assert.AreEqual(new Vector3(-0.05f, 0f, 0f), linearChange[1],
+                "Body 1 is pushed left by half penetration");
+
+            //Velocity Change
+
+
+            Vector3[] velocityChange = new Vector3[2];
+            Vector3[] rotationChange = new Vector3[2];
+
+
+            contact.ApplyVelocityChange(ref velocityChange, ref rotationChange);
+
+
+            Assert.AreEqual(
+                Vector3.Zero, 
+                rotationChange[0], 
+                "Zero rotation change for object 0");
+            Assert.AreEqual(
+                Vector3.Zero, 
+                rotationChange[1], 
+                "Zero rotation change for object 1");
+
+            Assert.AreEqual(
+                Vector3.Right * 2f,
+                velocityChange[0],
+                "Counter velocity applied to body 0");
+
+            Assert.AreEqual(
+                Vector3.Left * 2f,
+                velocityChange[1],
+                "Counter velocity applied to body 1");
+
+
+            Assert.AreEqual(
+                Vector3.Right,
+                bodyZero.Velocity);
+
+            Assert.AreEqual(
+                Vector3.Left,
+                bodyOne.Velocity);
+
+            int brak = 3;
         }
 
 
@@ -50,9 +108,10 @@ namespace ForeverTests
                 LastAccel = Vector3.Zero;
                 Acceler = Vector3.Zero;
                 Rotation = Vector3.Zero;
+                Orientation = Quaternion.Identity;
 
                 Awake = true;
-
+                Mass = 1;
             }
 
 
@@ -118,7 +177,7 @@ namespace ForeverTests
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    return Matrix.Identity;
                 }
                 set
                 {
@@ -128,7 +187,7 @@ namespace ForeverTests
 
             public Microsoft.Xna.Framework.Matrix InverseInertiaTensorWorld
             {
-                get { throw new NotImplementedException(); }
+                get { return Matrix.Identity; }
             }
 
             public Microsoft.Xna.Framework.Matrix World
@@ -138,14 +197,8 @@ namespace ForeverTests
 
             public Microsoft.Xna.Framework.Quaternion Orientation
             {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
+                get;
+                set;
             }
 
             public Microsoft.Xna.Framework.Vector3 AngularMomentum
@@ -160,21 +213,15 @@ namespace ForeverTests
 
             public float Mass
             {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
+                get;
+                set;
             }
 
             public float InverseMass
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    return 1f / Mass;
                 }
                 set
                 {
@@ -240,12 +287,12 @@ namespace ForeverTests
 
             public void addVelocity(Microsoft.Xna.Framework.Vector3 velo)
             {
-                throw new NotImplementedException();
+                Velocity += velo;
             }
 
             public void addRotation(Microsoft.Xna.Framework.Vector3 rot)
             {
-                throw new NotImplementedException();
+                Rotation += rot;
             }
 
             public Microsoft.Xna.Framework.Vector3 Up

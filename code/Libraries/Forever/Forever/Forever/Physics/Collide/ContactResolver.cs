@@ -14,10 +14,17 @@ namespace Forever.Physics.Collide
     {
         public float PenetrationEpsilon = 0.00025f;
         public float VelocityEpisilon = 0.00001f;
-        public int PositionIterations = 25;
-        public int VelocityIterations = 2;
+        public int PositionIterations = 1;
+        public int VelocityIterations = 1;
 
-
+        [EntityInspector("Position Iterations: ")]
+        public long TotalPositionIterationsExecuted { get; set; }
+        [EntityInspector("Velo Iterations: ")]
+        public long TotalVelocityIterationsExecuted { get; set; }
+        [EntityInspector("Overall Highest Desired Delta Velocity: ")]
+        public float HighestDDL { get; set; }
+        [EntityInspector("Overall Highest Penetration: ")]
+        public float HighestPenetration { get; set; }
 
 
         public void FullContactResolution(List<Contact> contacts, float duration)
@@ -31,7 +38,6 @@ namespace Forever.Physics.Collide
         }
 
 
-        #region Updating and Recalculating Contacts
         private void UpdateContacts(List<Contact> contacts, float duration)
         {
             foreach (Contact contact in contacts)
@@ -40,7 +46,7 @@ namespace Forever.Physics.Collide
             }
 
         }
-        #endregion
+   
 
         private void AdjustPositions(List<Contact> contacts, float duration)
         {
@@ -88,6 +94,7 @@ namespace Forever.Physics.Collide
 
                 iterationsUsed++;
             }
+            this.TotalPositionIterationsExecuted += iterationsUsed;
 
         }
 
@@ -107,6 +114,7 @@ namespace Forever.Physics.Collide
                 {
                     break; ;
                 }
+
                 
                 primeContact.MatchAwakeState();
                 primeContact.ApplyVelocityChange(ref velocityChange, ref rotationChange);
@@ -129,7 +137,6 @@ namespace Forever.Physics.Collide
 
                                     contact.ContactVelocity +=
                                         Vector3.Transform(deltaVel, Matrix.Transpose(contact.ContactWorld)) * (b == 0 ? -1 : 1);
-                                    contact.CalcDesiredDeltaVelocity(duration);
                                     
                                 }
 
@@ -142,6 +149,8 @@ namespace Forever.Physics.Collide
 
                 numIterations++;
             }
+
+            this.TotalVelocityIterationsExecuted += numIterations;
         }
 
         private Contact FindHighPenetration(List<Contact> contacts)
@@ -156,7 +165,11 @@ namespace Forever.Physics.Collide
                     winner = contact;
                 }
             }
-           
+
+            if (maxPen > this.HighestPenetration)
+            {
+                this.HighestPenetration = maxPen;
+            }
 
             return winner;
         }
@@ -172,6 +185,11 @@ namespace Forever.Physics.Collide
                     maxDDV = contact.DesiredDeltaVelocity;
                     winner = contact;
                 }
+            }
+
+            if (maxDDV > this.HighestDDL)
+            {
+                this.HighestDDL = maxDDV;
             }
 
 

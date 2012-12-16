@@ -13,7 +13,7 @@ namespace Forever.Physics
   public class RigidBody : IRigidBody
   {
 
-      private const float SleepEpsilon = 0.00000005f;
+      private const float SleepEpsilon = 0.000005f;
 
       #region Body Space Basis
       [EntityInspector("Body Forward")]
@@ -163,13 +163,11 @@ namespace Forever.Physics
                 _awake = true;
                 _motion = SleepEpsilon * 2f;
             }
-            else
+            else 
             {
                 _awake = false;
                 Velocity = Vector3.Zero;
-                //this._acceleration = Vector3.Zero;
                 _rotation = Vector3.Zero;
-                //this.clearAccumulators();
             }
         } 
     }
@@ -188,7 +186,6 @@ namespace Forever.Physics
     {
         Debug.Sanity(rot);
         this._rotation += rot;
-        //this.angularMomentum = _rotation;
        
     }
 

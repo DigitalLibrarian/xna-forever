@@ -28,10 +28,11 @@ namespace Forever.Demos
         public ModelEntity EntityOne { get; set; }
         public ModelEntity EntityTwo { get; set; }
 
-        public int ContactsPerFrame { get; set; }
 
         public SkyDome SkyDome { get; set; }
 
+
+        public ContactResolver ContactResolver { get; set; }
         #endregion
 
         CollideType primOneCollideType;
@@ -43,6 +44,8 @@ namespace Forever.Demos
 
         public CollideDemo(CollideType primOne, CollideType primTwo) : base()
         {
+            ContactResolver = new Physics.Collide.ContactResolver();
+
             primOneCollideType = primOne;
             primTwoCollideType = primTwo;
 
@@ -55,7 +58,6 @@ namespace Forever.Demos
            
             DefaultRestitution = 1f;
             LastContact = new Contact();
-            this.ContactsPerFrame = 10;
 
         }
 
@@ -78,7 +80,7 @@ namespace Forever.Demos
         public override void AddEntity(IGameEntity ent)
         {
             //this.ForceRegistry.Add(ent, new WhenAwakeFG(Vector3.Down * 0.0000004f));
-            
+            //this.ForceRegistry.Add(ent, new TowardsBodyFG(CamBody, 0.000004f));
             base.AddEntity(ent);
         }
 
@@ -90,30 +92,51 @@ namespace Forever.Demos
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-            //EntityOne.Body.AngularDamping = 0.999f;
-            EntityOne.Body.LinearDamping = 0.9999f;
-            //EntityTwo.Body.AngularDamping = 0.999f;
-            EntityTwo.Body.LinearDamping = 0.9999f;
-
-
-            EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
-            EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.001f));
+            
+            EntityOne.Body.AngularDamping = 0.999999999f;
+            EntityOne.Body.LinearDamping = 0.999999999f;
+            EntityTwo.Body.AngularDamping = 0.999999999f;
+            EntityTwo.Body.LinearDamping = 0.999999999f;
             
             
+            //EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
+            //EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.001f));
+            
+            /*
             EntityOne.addForce(new Vector3(
                 0.00001f, 
                 0.0000005f, 
                 0f
                 ));
-
+            
 
             EntityTwo.addForce(new Vector3(
                 -0.00001f,
-                -0.0000005f,
+                0.00000025f,
                 0f
                 ));
-             
+             */
+            
 
+            
+            // Thump Entity One towards Entity Two by applying a force on it's surface
+            float radius = EntityOne.GeometryData.BoundingSphere.Radius;
+            EntityOne.addForce(
+                new Vector3(0.00001f, 0f, 0f),
+                EntityOne.CenterOfMass -
+                    new Vector3(0f, radius, 0f)
+                    );
+
+
+            // Thump Entity Two towards Entity One by applying a force on it's surface
+            radius = EntityTwo.GeometryData.BoundingSphere.Radius;
+            EntityTwo.addForce(
+                new Vector3(-0.00001f, 0f, 0f),
+                EntityTwo.CenterOfMass +
+                    new Vector3(0f, radius, 0f)
+                    );
+
+            
 
             this.AddEntity(EntityOne);
             this.AddEntity(EntityTwo);
@@ -139,6 +162,7 @@ namespace Forever.Demos
             TilingPlaneEntity floorEntity = new TilingPlaneEntity(body, geoData);
             floorEntity.LoadContent(this.ScreenManager.Game.Content);
             this.AddEntity(floorEntity);
+            SpawnGroupOfBlocks();
         }
 
         private void SpawnGroupOfBlocks()
@@ -149,9 +173,9 @@ namespace Forever.Demos
             Vector3 origin = Vector3.Zero + (new Vector3(-(size*spacing)/2f, 0f, (-size*spacing)/2f) );
             int numRows = size;
             int numCols = size;
-            float ceilingY = 20f;
-            float floorY = -20f;
-            for (float i = 0; i < numRows; i++)
+            float ceilingY = 15f;
+            float floorY = 5f;
+            for (float i = 0; i < numCols; i++)
             {
                 for (float j = 0; j < numCols; j++)
                 {
@@ -167,11 +191,62 @@ namespace Forever.Demos
             }
         }
 
-        private ModelEntity TestCube()
+        
+
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            return MEFactory.Create(CollideType.Box, Camera.Position, DefaultSphereMass, DefaultSphereRadius);
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+            PumpCollisions((float)gameTime.ElapsedGameTime.Milliseconds);
+            SkyDome.Update();
+        }
+
+        private void PumpCollisions(float duration)
+        {
+
+            List<ICollideable> colliders = this.ICollideables;
+
+            IEnumerable<ICollideable> gameObjectsLeft = colliders;
+            IEnumerable<ICollideable> gameObjectsRight = colliders;
+
+            CollisionDetector detect = new CollisionDetector();
+            List<Contact> contacts = new List<Contact>();
+            foreach (ICollideable left in gameObjectsLeft)
+            {
+                foreach (ICollideable right in gameObjectsRight)
+                {
+                    if (left != right)
+                    {
+                        CollisionData data = ManageCollisions(detect, left, right, duration);
+                        contacts.AddRange(data.contacts);
+                    }
+                }
+            }
+
+            if (contacts.Count > 0)
+            {
+                int brak = 2344;
+            }
+
+            ContactResolver.FullContactResolution(contacts, duration);
+
+            if (contacts.Count > 0)
+            {
+                saveLastContact(contacts[0]);
+            }
+
 
         }
+
+        private CollisionData ManageCollisions(CollisionDetector detect, ICollideable left, ICollideable right, float duration)
+        {
+ 
+            CollisionData data = new CollisionData();
+            data.restitution = this.DefaultRestitution;
+            detect.FindContacts(left.GeometryData.Prim, right.GeometryData.Prim, data);
+            return data;
+        }
+
+
 
         #region LastContact for debugging
         public Contact LastContact { get; set; }
@@ -201,72 +276,6 @@ namespace Forever.Demos
         #endregion 
 
 
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
-        {
-            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
-            PumpCollisions((float)gameTime.ElapsedGameTime.Milliseconds);
-            SkyDome.Update();
-        }
-
-        private void PumpCollisions(float duration)
-        {
-
-            List<ICollideable> colliders = this.ICollideables;
-            int midPoint = this.ICollideables.Count / 2;
-
-            IEnumerable<ICollideable> gameObjectsLeft = colliders;
-            IEnumerable<ICollideable> gameObjectsRight = colliders;
-
-            CollisionDetector detect = new CollisionDetector();
-            List<Contact> contacts = new List<Contact>();
-            foreach (ICollideable left in gameObjectsLeft)
-            {
-                foreach (ICollideable right in gameObjectsRight)
-                {
-                    if (left != right)
-                    {
-                        CollisionData data = ManageCollisions(detect, left, right, duration);
-                        if (data != null)
-                        {
-                            contacts.Add(data.contacts[0]);
-                        }
-
-                    }
-                }
-            }
-
-         
-
-            ContactResolver resolve = new ContactResolver();
-           // resolve.PositionIterations = ContactsPerFrame;
-          //  resolve.VelocityIterations = ContactsPerFrame;
-            resolve.FullContactResolution(contacts, duration);
-
-            if (contacts.Count > 0)
-            {
-                saveLastContact(contacts[0]);
-            }
-
-
-        }
-
-        private CollisionData ManageCollisions(CollisionDetector detect, ICollideable left, ICollideable right, float duration)
-        {
- 
-                CollisionData data = new CollisionData();
-                data.restitution = this.DefaultRestitution;
-                
-                int numContacts = detect.FindContacts(left.GeometryData.Prim, right.GeometryData.Prim, data);
-                if (numContacts == 0)
-                {
-                    return null;
-                }
-
-                return data;
-        }
-
-
-
 
         #region Console Commands
         public void Together()
@@ -293,10 +302,14 @@ namespace Forever.Demos
             this.ForceRegistry.Add( entityOne, new TowardsBodyFG( entityTwo.Body, forceMag));
             this.ForceRegistry.Add( entityTwo, new TowardsBodyFG( entityOne.Body, forceMag));
         }
-
-        public override void Smack(ModelEntity modelEntity)
+        /// <summary>
+        /// Produce a physical box and spawn it at the camera position
+        /// </summary>
+        /// <returns></returns>
+        private ModelEntity TestCube()
         {
-            base.Smack(modelEntity, DefaultSphereRadius);
+            return MEFactory.Create(CollideType.Box, Camera.Position, DefaultSphereMass, DefaultSphereRadius);
+
         }
         
         #endregion

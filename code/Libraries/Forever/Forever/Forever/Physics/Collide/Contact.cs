@@ -73,15 +73,11 @@ namespace Forever.Physics.Collide
 
         relativeContactPositions = new Vector3[2];
         relativeContactPositions[0] = Bodies[0].Position - Point;
-          
-        if (Bodies[1] != null)
-        {
-            relativeContactPositions[1] = Bodies[1].Position - Point;
-        }
 
         contactVelocity = CalcLocalVelocity(0, duration);
         if (Bodies[1] != null)
         {
+            relativeContactPositions[1] = Bodies[1].Position - Point;
             contactVelocity -= CalcLocalVelocity(1, duration);
         }
 
@@ -140,20 +136,20 @@ namespace Forever.Physics.Collide
         Debug.Sanity(contactTangent[1]);
     }
 
-    private Vector3 CalcLocalVelocity(int bodyIndex, float duration)
+    public Vector3 CalcLocalVelocity(int bodyIndex, float duration)
     {
         IRigidBody body = Bodies[bodyIndex];
         Vector3 velocity = TrickyMathHelper.VectorProduct(body.Rotation, relativeContactPositions[bodyIndex]);
         velocity += body.Velocity;
 
-        Matrix inverseWorld = Matrix.Transpose(ContactWorld);//Matrix.Invert(ContactWorld);
+        Matrix inverseWorld = Matrix.Transpose(ContactWorld);
         Vector3 contactVelo = Vector3.Transform(velocity, inverseWorld);
 
         Vector3 accVelo = body.LastAccel * duration;
         accVelo = Vector3.Transform(accVelo, inverseWorld);
 
         accVelo = new Vector3(
-            accVelo.X, 0f, 0f//accVelo.Y, accVelo.Z
+            accVelo.X, 0f, 0f // only interested velocity in the direction of the contact normal in local space (forward on x)
            );
         contactVelo += accVelo;
         Debug.Sanity(contactVelo);
@@ -169,7 +165,7 @@ namespace Forever.Physics.Collide
 
     public void CalcDesiredDeltaVelocity(float duration)
     {
-        float veloLimit = 0.1f;
+        float veloLimit = 1f;
 
         float veloFromAcc = 0f;
 
@@ -180,12 +176,12 @@ namespace Forever.Physics.Collide
 
         if (Bodies[1] != null && Bodies[1].Awake)
         {
-            veloFromAcc += (Bodies[1].LastAccel * duration * Normal).Length();
+            veloFromAcc -= (Bodies[1].LastAccel * duration * Normal).Length();
         }
 
         float effectRet = Restitution;
 
-        if (TrickyMathHelper.Abs(ContactVelocity.X) > veloLimit)
+        if (TrickyMathHelper.Abs(ContactVelocity.X) < veloLimit)
         {
             effectRet = 0f;
         }
@@ -193,7 +189,10 @@ namespace Forever.Physics.Collide
         // Combine the bounce velocity with the removed
         // acceleration velocity.
 
-        desiredDeltaVelocity = -ContactVelocity.X - ((1f - effectRet) * (ContactVelocity.X - veloFromAcc));
+        desiredDeltaVelocity =
+            -ContactVelocity.X
+            - (effectRet * (ContactVelocity.X - veloFromAcc));
+            //- ((1f - effectRet) * (ContactVelocity.X - veloFromAcc));
 
     }
 
@@ -334,11 +333,13 @@ namespace Forever.Physics.Collide
 
         if (Bodies.Length > 1 && Bodies[1] != null)
         {
+            impulseContactSpace *= -1f;
+            impulseWorld = Vector3.Transform(impulseContactSpace, ContactWorld);
 
-            impulsiveTorque = Vector3.Cross(impulsiveTorque, this.RelativeContactPositions[1]);
+            impulsiveTorque = Vector3.Cross(impulseWorld, this.RelativeContactPositions[1]);
 
             rotationChange[1] = Vector3.Transform(impulsiveTorque, inverseInertiaTensor[1]);
-            velocityChange[1] = impulseWorld * -Bodies[1].InverseMass;
+            velocityChange[1] = impulseWorld * Bodies[1].InverseMass;
 
             Bodies[1].addVelocity(velocityChange[1]);
             Bodies[1].addRotation(rotationChange[1]);
@@ -357,7 +358,7 @@ namespace Forever.Physics.Collide
         float deltaVelocity = TrickyMathHelper.ScalarProduct(deltaVelWorld, Normal);
         deltaVelocity += Bodies[0].InverseMass;
 
-        if (Bodies.Length > 1 && Bodies[1] != null)
+        if (Bodies[1] != null)
         {
             deltaVelWorld = TrickyMathHelper.VectorProduct(RelativeContactPositions[1], Normal);;
             deltaVelWorld = Vector3.Transform(deltaVelWorld, inverseInertiaTensor[1]);
@@ -366,8 +367,15 @@ namespace Forever.Physics.Collide
             deltaVelocity += TrickyMathHelper.ScalarProduct(deltaVelWorld, Normal);
             deltaVelocity += Bodies[1].InverseMass;
         }
-
-        Vector3 result = new Vector3(desiredDeltaVelocity / deltaVelocity, 0f, 0f);
+        Vector3 result;
+        if (deltaVelocity != 0)
+        {
+            result = new Vector3(desiredDeltaVelocity / deltaVelocity, 0f, 0f);
+        }
+        else
+        {
+            result = new Vector3(deltaVelocity, 0f, 0f);
+        }
         Debug.Sanity(result);
         return result;
         //return new Vector3(desiredDeltaVelocity, 0f, 0f); ;
