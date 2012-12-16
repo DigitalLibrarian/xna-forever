@@ -12,9 +12,9 @@ namespace Forever.Physics.Collide
 {
     public class ContactResolver
     {
-        public float PenetrationEpsilon = 0.00025f;
+        public float PenetrationEpsilon = 0.000025f;
         public float VelocityEpisilon = 0.00001f;
-        public int PositionIterations = 1;
+        public int PositionIterations = 2;
         public int VelocityIterations = 1;
 
         [EntityInspector("Position Iterations: ")]

@@ -20,7 +20,7 @@ namespace Forever.Physics.ForceGen
         {
             if (forceTarget.Awake)
             {
-                forceTarget.addForce(Force);
+                forceTarget.addForce(Force * forceTarget.Mass);
             }
         }
     }

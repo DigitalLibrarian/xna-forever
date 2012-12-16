@@ -38,6 +38,7 @@ namespace Forever.Physics.Collide
       
     [EntityInspector("Penetration")]
     public float Penetration { get; set; }
+      [EntityInspector("Restitution")]
     public float Restitution { get; set; }
     public float Friction { get; set;  }
     public IRigidBody[] Bodies { get; set; }
@@ -165,7 +166,7 @@ namespace Forever.Physics.Collide
 
     public void CalcDesiredDeltaVelocity(float duration)
     {
-        float veloLimit = 1f;
+        float veloLimit = .1f;
 
         float veloFromAcc = 0f;
 
@@ -374,7 +375,7 @@ namespace Forever.Physics.Collide
         }
         else
         {
-            result = new Vector3(deltaVelocity, 0f, 0f);
+            result = new Vector3(0f, 0f, 0f);
         }
         Debug.Sanity(result);
         return result;

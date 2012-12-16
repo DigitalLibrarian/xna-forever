@@ -25,7 +25,7 @@ namespace Forever.GameEntities
         public ModelEntityFactory()
         {
             LinearDamping = 0.99997f;
-            AngularDamping = 0.999997f;
+            AngularDamping = 0.9999997f;
         }
 
         public void LoadContent(ContentManager content)

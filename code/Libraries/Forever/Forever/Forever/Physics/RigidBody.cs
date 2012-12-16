@@ -13,7 +13,7 @@ namespace Forever.Physics
   public class RigidBody : IRigidBody
   {
 
-      private const float SleepEpsilon = 0.000005f;
+      private const float SleepEpsilon = 0.0000092f;
 
       #region Body Space Basis
       [EntityInspector("Body Forward")]
@@ -62,6 +62,8 @@ namespace Forever.Physics
 
     [EntityInspector("Motion")]
     public float Motion { get { return _motion; } }
+      [EntityInspector("Smallest positive motion: ")]
+    public float SmallestPositiveMotion { get; set; }
     float _motion;
 
     Matrix _transform_matrix;
@@ -122,7 +124,8 @@ namespace Forever.Physics
     {
         get { return _inverse_inertia_tensor_world; }
     }
-    public float LinearDamping { get { return _linear_damping; } set { _linear_damping = value; } }
+    public float LinearDamping { get { return _linear_damping; } set { 
+        _linear_damping = value; } }
     public float AngularDamping { get { return _angular_damping; } set { _angular_damping = value;} }
 
 
@@ -161,7 +164,7 @@ namespace Forever.Physics
             if (value)
             {
                 _awake = true;
-                _motion = SleepEpsilon * 2f;
+                _motion = float.MaxValue;
             }
             else 
             {
@@ -197,6 +200,7 @@ namespace Forever.Physics
       this._awake = true;
       this.CanSleep = true;
       this._motion = float.MaxValue;
+      this.SmallestPositiveMotion = float.MaxValue;
       this._position = pos;
       this._velocity = Vector3.Zero;
       this._acceleration = Vector3.Zero;
@@ -204,6 +208,7 @@ namespace Forever.Physics
       this._transform_matrix = Matrix.Identity;
       this._inverse_inertia_tensor_world = Matrix.Identity;
       this._inverse_inertia_tensor = Matrix.Identity;
+      this._motion = float.MaxValue;
       clearAccumulators();
       calculateDerivedData();
       
@@ -243,6 +248,7 @@ namespace Forever.Physics
         {
             return;
         }
+
         // No, I'm not fucking kidding.
         Debug.Sanity(_last_acceleration);
         Debug.Sanity(_acceleration);
@@ -280,27 +286,37 @@ namespace Forever.Physics
 
         calculateDerivedData();
         clearAccumulators();
+
+        trySleep(duration);
+    }
+
+    private void trySleep(float duration)
+    {
         if (CanSleep && Awake)
         {
             float currentMotion = TrickyMathHelper.ScalarProduct(Velocity, Velocity) + TrickyMathHelper.ScalarProduct(Rotation, Rotation);
 
-            float bias = (float)Math.Pow(0.5, (double)duration);
-            _motion = bias * _motion + (1 - bias) * currentMotion;
-
-
-            if (Awake && _motion < SleepEpsilon  )
+            float bias = (float)Math.Pow(0.9, (double)duration);
+            float newMotion = bias * _motion + (1 - bias) * currentMotion;
+            if (newMotion > 0 && newMotion < this.SmallestPositiveMotion)
             {
-                Awake = false;
+                this.SmallestPositiveMotion = newMotion;
+            }
+
+            if (Awake && newMotion < SleepEpsilon)
+            {
+                _awake = false;
                 _motion = 0;
             }
-            else if (_motion > 10 * SleepEpsilon)
+            else if (newMotion > 10 * SleepEpsilon)
             {
                 _motion = 10 * SleepEpsilon;
             }
 
-            
-        }
+            _motion = newMotion;
 
+
+        }
 
     }
 

@@ -22,6 +22,7 @@ namespace Forever.GameEntities
         IRigidBody body = null;
         public IRigidBody Body { get { return body; } }
 
+        public float Mass { get { return body.Mass; } }
         public bool Awake { get { return false; } }
 
         #region Rendering Properties

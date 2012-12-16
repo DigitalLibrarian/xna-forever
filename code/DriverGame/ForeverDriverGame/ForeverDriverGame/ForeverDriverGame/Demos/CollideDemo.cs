@@ -79,8 +79,10 @@ namespace Forever.Demos
 
         public override void AddEntity(IGameEntity ent)
         {
-            //this.ForceRegistry.Add(ent, new WhenAwakeFG(Vector3.Down * 0.0000004f));
+            this.ForceRegistry.Add(ent, new WhenAwakeFG(Vector3.Down * 0.0000004f));
             //this.ForceRegistry.Add(ent, new TowardsBodyFG(CamBody, 0.000004f));
+
+            
             base.AddEntity(ent);
         }
 
@@ -92,12 +94,12 @@ namespace Forever.Demos
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-            
+            /*
             EntityOne.Body.AngularDamping = 0.999999999f;
             EntityOne.Body.LinearDamping = 0.999999999f;
             EntityTwo.Body.AngularDamping = 0.999999999f;
             EntityTwo.Body.LinearDamping = 0.999999999f;
-            
+            */
             
             //EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
             //EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.001f));
@@ -115,9 +117,9 @@ namespace Forever.Demos
                 0.00000025f,
                 0f
                 ));
-             */
-            
-
+             
+            */
+            /*
             
             // Thump Entity One towards Entity Two by applying a force on it's surface
             float radius = EntityOne.GeometryData.BoundingSphere.Radius;
@@ -135,7 +137,7 @@ namespace Forever.Demos
                 EntityTwo.CenterOfMass +
                     new Vector3(0f, radius, 0f)
                     );
-
+            */
             
 
             this.AddEntity(EntityOne);
@@ -155,6 +157,9 @@ namespace Forever.Demos
 
 
             IRigidBody body = new Forever.Physics.RigidBody(Vector3.Zero);
+            body.LinearDamping = 0f;
+            body.AngularDamping = 0f;
+            body.InverseMass = 0f;
             Forever.Physics.Collide.Plane plane = new Physics.Collide.Plane(body, Vector3.Zero, Vector3.Up);
             IGeometryData geoData = new Forever.GameEntities.EntityGeometryData();
             geoData.Prim = plane;
@@ -162,7 +167,8 @@ namespace Forever.Demos
             TilingPlaneEntity floorEntity = new TilingPlaneEntity(body, geoData);
             floorEntity.LoadContent(this.ScreenManager.Game.Content);
             this.AddEntity(floorEntity);
-            SpawnGroupOfBlocks();
+
+            //SpawnGroupOfBlocks();
         }
 
         private void SpawnGroupOfBlocks()
@@ -183,7 +189,7 @@ namespace Forever.Demos
                     ModelEntity ceiling = MEFactory.Create(CollideType.Box, spawnPos, 1f, 1f);
                     spawnPos = origin + new Vector3(i * spacing, floorY, j *spacing);
                     ModelEntity floor = MEFactory.Create(CollideType.Box, spawnPos, 1f, 1f);
-
+                    
                     this.AddEntity(ceiling);
                     this.AddEntity(floor);
 
@@ -222,10 +228,6 @@ namespace Forever.Demos
                 }
             }
 
-            if (contacts.Count > 0)
-            {
-                int brak = 2344;
-            }
 
             ContactResolver.FullContactResolution(contacts, duration);
 

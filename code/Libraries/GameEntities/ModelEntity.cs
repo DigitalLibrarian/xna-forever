@@ -40,6 +40,7 @@ namespace Forever.GameEntities
             get { return body; }
         }
 
+        public float Mass { get { return body.Mass; } }
 
         //public Primitive Prim { get; set; }
 

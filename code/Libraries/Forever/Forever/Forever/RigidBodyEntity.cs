@@ -28,6 +28,7 @@ namespace Forever
       set { model = value; }
     }
 
+    public float Mass { get { return body.Mass; } }
     public Matrix World { get { return world; } }
     public AABBTree AABB { get { return tree; } set { tree = value; } }
 

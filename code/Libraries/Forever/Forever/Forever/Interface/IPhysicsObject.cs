@@ -14,6 +14,9 @@ namespace Forever.Interface
         void addForce(Vector3 force, Vector3 point);
         void integrate(float duration);
 
+        [EntityInspector("Mass")]
+        float Mass { get; }
+
         [EntityInspector("CoM")]
         Vector3 CenterOfMass { get; }
 
