@@ -13,7 +13,7 @@ namespace Forever.Physics
   public class RigidBody : IRigidBody
   {
 
-      private const float SleepEpsilon = 0.0000092f;
+      private const float SleepEpsilon = 0.000009f;
 
       #region Body Space Basis
       [EntityInspector("Body Forward")]
@@ -75,6 +75,7 @@ namespace Forever.Physics
     Vector3 _last_acceleration;
 
     bool _awake;
+
     #endregion
 
     #region X-or properties
@@ -337,15 +338,13 @@ namespace Forever.Physics
       Vector3 pt = point;
       pt -= _position;
 
-      _force_accum += force;
-
+        
       // you probably think i'm kidding...
       Debug.Sanity(_torque_accum);
       _torque_accum += Vector3.Cross(pt, force);
       Debug.Sanity(_torque_accum);
 
-
-      _awake = true;
+      this.addForce(force);
     }
     public void addTorque(Vector3 torque)
     {

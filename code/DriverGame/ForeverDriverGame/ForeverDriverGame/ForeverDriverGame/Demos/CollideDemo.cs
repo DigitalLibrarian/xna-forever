@@ -94,33 +94,12 @@ namespace Forever.Demos
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-            /*
-            EntityOne.Body.AngularDamping = 0.999999999f;
-            EntityOne.Body.LinearDamping = 0.999999999f;
-            EntityTwo.Body.AngularDamping = 0.999999999f;
-            EntityTwo.Body.LinearDamping = 0.999999999f;
-            */
-            
-            //EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
-            //EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.001f));
-            
-            /*
-            EntityOne.addForce(new Vector3(
-                0.00001f, 
-                0.0000005f, 
-                0f
-                ));
-            
+           
+            EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
+            EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.00f));
 
-            EntityTwo.addForce(new Vector3(
-                -0.00001f,
-                0.00000025f,
-                0f
-                ));
-             
-            */
-            /*
             
+            /*
             // Thump Entity One towards Entity Two by applying a force on it's surface
             float radius = EntityOne.GeometryData.BoundingSphere.Radius;
             EntityOne.addForce(
@@ -137,8 +116,8 @@ namespace Forever.Demos
                 EntityTwo.CenterOfMass +
                     new Vector3(0f, radius, 0f)
                     );
-            */
             
+            */
 
             this.AddEntity(EntityOne);
             this.AddEntity(EntityTwo);

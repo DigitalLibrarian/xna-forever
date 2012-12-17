@@ -18,9 +18,30 @@ namespace Forever.Physics.ForceGen
 
         public void updateForce(IPhysicsObject forceTarget, GameTime gameTime)
         {
-            if (forceTarget.Awake)
+            //if (forceTarget.Awake)
             {
-                forceTarget.addForce(Force * forceTarget.Mass);
+                Vector3 appliedForce = Force * forceTarget.Mass;
+                Forever.Interface.ICollideable bodyHaver = forceTarget as ICollideable;
+                Forever.Physics.Collide.Primitive prim = bodyHaver.GeometryData.Prim;
+                if (prim is Forever.Physics.Collide.Box)
+                {
+                    Forever.Physics.Collide.Box box = prim as Forever.Physics.Collide.Box;
+                    Vector3 totalForce = appliedForce;
+                    float oldMag = totalForce.Length();
+                    totalForce.Normalize();
+                    float newMag = (oldMag/8f);
+                    totalForce *= newMag;
+
+                    foreach (Vector3 corner in box.WorldVerts())
+                    {
+                        forceTarget.addForce(totalForce, corner);
+                    }
+
+                }
+                else
+                {
+                    forceTarget.addForce(appliedForce);
+                }
             }
         }
     }

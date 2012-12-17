@@ -24,8 +24,10 @@ namespace Forever.Physics.Collide
 
     [EntityInspector("Contact Point")]
     public Vector3 Point { get; set; }
-    [EntityInspector("Contact Normal")]
+    
     private Vector3 _privNormal = Vector3.Zero;
+
+    [EntityInspector("Contact Normal")]  
     public Vector3 Normal {
         get { return _privNormal; }
         set
