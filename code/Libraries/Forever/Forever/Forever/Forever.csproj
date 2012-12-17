@@ -128,7 +128,6 @@
     <Compile Include="Physics\MadMatrix.cs" />
     <Compile Include="Physics\Particle.cs" />
     <Compile Include="Physics\RigidBody.cs" />
-    <Compile Include="Physics\RigidBodyHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueuedList.cs" />
     <Compile Include="Render\AABBTreeRenderer.cs" />

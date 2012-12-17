@@ -124,17 +124,6 @@ namespace Forever
        
 
 
-        public static Vector3[] MatrixColumnVectors(Matrix m)
-        {
-            Matrix4 mat4 = RigidBodyHelper.MatrixtoMatrix4(m);
-
-            return new Vector3[]{
-                new Vector3( mat4.data[0], mat4.data[4], mat4.data[8]),
-                new Vector3( mat4.data[1], mat4.data[5], mat4.data[9]),
-                new Vector3( mat4.data[2], mat4.data[6], mat4.data[10])
-            };
-        }
-
 
         public static bool MakeOrthonormalBasis(Vector3 x, Vector3 suggestedY, out Vector3 y, out Vector3 z)
         {
