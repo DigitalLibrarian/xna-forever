@@ -84,9 +84,9 @@ namespace Forever.Physics.Collide
             Vector3 halfSizes = box.HalfSizes;
 
             Vector3 absPoint = new Vector3(
-                TrickyMathHelper.Abs(pointLocal.X),
-                TrickyMathHelper.Abs(pointLocal.Y),
-                TrickyMathHelper.Abs(pointLocal.Z)
+                TrickyMath.Abs(pointLocal.X),
+                TrickyMath.Abs(pointLocal.Y),
+                TrickyMath.Abs(pointLocal.Z)
                 );
 
             Vector3 check = halfSizes - absPoint;
@@ -97,9 +97,9 @@ namespace Forever.Physics.Collide
             }
 
             Vector3 depth = new Vector3(
-                TrickyMathHelper.Abs(absPoint.X - halfSizes.X),
-                TrickyMathHelper.Abs(absPoint.Y - halfSizes.Y),
-                TrickyMathHelper.Abs(absPoint.Z - halfSizes.Z)
+                TrickyMath.Abs(absPoint.X - halfSizes.X),
+                TrickyMath.Abs(absPoint.Y - halfSizes.Y),
+                TrickyMath.Abs(absPoint.Z - halfSizes.Z)
                 );
 
             depth = new Vector3(
@@ -116,7 +116,7 @@ namespace Forever.Physics.Collide
                 Vector3 boxAxis = box.getAxis(0);
                 contact.Normal = boxAxis * (pointLocal.X > 0 ? -1f : 1f);
                 contact.Point = pointWorld;
-                contact.Penetration = TrickyMathHelper.Abs(absPoint.X - halfSizes.X);
+                contact.Penetration = TrickyMath.Abs(absPoint.X - halfSizes.X);
 
                 contact.Bodies[0] = box.Body;
                 contact.Bodies[1] = null;
@@ -135,7 +135,7 @@ namespace Forever.Physics.Collide
                 Vector3 boxAxis = box.getAxis(1);
                 contact.Normal = boxAxis * (pointLocal.Y > 0 ? -1f : 1f);
                 contact.Point = pointWorld;
-                contact.Penetration = TrickyMathHelper.Abs(absPoint.Y - halfSizes.Y);
+                contact.Penetration = TrickyMath.Abs(absPoint.Y - halfSizes.Y);
 
                 contact.Bodies[0] = box.Body;
                 contact.Bodies[1] = null;
@@ -153,7 +153,7 @@ namespace Forever.Physics.Collide
                 Vector3 boxAxis = box.getAxis(2);
                 contact.Normal = boxAxis * (pointLocal.Z > 0 ? -1f : 1f);
                 contact.Point = pointWorld;
-                contact.Penetration = TrickyMathHelper.Abs(absPoint.Z - halfSizes.Z);
+                contact.Penetration = TrickyMath.Abs(absPoint.Z - halfSizes.Z);
 
                 contact.Bodies[0] = box.Body;
                 contact.Bodies[1] = null;
@@ -208,9 +208,9 @@ namespace Forever.Physics.Collide
 
             float distCenters = midLineRight.Length();
 
-            Vector3 projectedLeftEdge = TrickyMathHelper.Project(leftEdgeOne - leftCenter, midLineRight);
+            Vector3 projectedLeftEdge = TrickyMath.Project(leftEdgeOne - leftCenter, midLineRight);
             float distLeftCenterToEdge = projectedLeftEdge.Length();
-            Vector3 projectedRightEdge = TrickyMathHelper.Project(rightEdgeOne - rightCenter, -midLineRight);
+            Vector3 projectedRightEdge = TrickyMath.Project(rightEdgeOne - rightCenter, -midLineRight);
             float distRightCenterToEdge = projectedRightEdge.Length();
 
             
@@ -234,11 +234,11 @@ namespace Forever.Physics.Collide
             Vector3 x = leftEdgeOne - leftEdgeTwo; ;
             x.Normalize();
             Vector3 y, z;
-            TrickyMathHelper.MakeOrthonormalBasis(x, out y, out z);
+            TrickyMath.MakeOrthonormalBasis(x, out y, out z);
             Vector3 realY = y;
 
 
-            Vector3 normal = TrickyMathHelper.VectorProduct(x, realY);
+            Vector3 normal = TrickyMath.VectorProduct(x, realY);
             normal.Normalize();
             contact.Normal = normal;
             data.contacts.Add(contact);
@@ -249,9 +249,9 @@ namespace Forever.Physics.Collide
 
         private static float transformToAxis(Box box, Vector3 axis)
         {
-            return box.HalfSizes.X * TrickyMathHelper.Abs(Vector3.Dot(axis, box.getAxis(0)))
-                + box.HalfSizes.Y * TrickyMathHelper.Abs(Vector3.Dot(axis, box.getAxis(1)))
-                + box.HalfSizes.Z * TrickyMathHelper.Abs(Vector3.Dot(axis, box.getAxis(2)));
+            return box.HalfSizes.X * TrickyMath.Abs(Vector3.Dot(axis, box.getAxis(0)))
+                + box.HalfSizes.Y * TrickyMath.Abs(Vector3.Dot(axis, box.getAxis(1)))
+                + box.HalfSizes.Z * TrickyMath.Abs(Vector3.Dot(axis, box.getAxis(2)));
 
         }
 
@@ -260,7 +260,7 @@ namespace Forever.Physics.Collide
             float oneProject = transformToAxis(one, axis);
             float twoProject = transformToAxis(two, axis);
 
-            float dist = TrickyMathHelper.Abs(TrickyMathHelper.ScalarProduct(toCenter, axis));
+            float dist = TrickyMath.Abs(TrickyMath.ScalarProduct(toCenter, axis));
             return oneProject + twoProject - dist;
         }
 
@@ -303,15 +303,15 @@ namespace Forever.Physics.Collide
 
             int bestSingleAxis = best;
 
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(0), two.getAxis(0)), toCenter, 6, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(0), two.getAxis(1)), toCenter, 7, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(0), two.getAxis(2)), toCenter, 8, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(1), two.getAxis(0)), toCenter, 9, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(1), two.getAxis(1)), toCenter, 10, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(1), two.getAxis(2)), toCenter, 11, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(2), two.getAxis(0)), toCenter, 12, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(2), two.getAxis(1)), toCenter, 13, ref pen, ref best)) return 0;
-            if (!tryAxis(one, two, TrickyMathHelper.VectorProduct(one.getAxis(2), two.getAxis(2)), toCenter, 14, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(0), two.getAxis(0)), toCenter, 6, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(0), two.getAxis(1)), toCenter, 7, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(0), two.getAxis(2)), toCenter, 8, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(1), two.getAxis(0)), toCenter, 9, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(1), two.getAxis(1)), toCenter, 10, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(1), two.getAxis(2)), toCenter, 11, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(2), two.getAxis(0)), toCenter, 12, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(2), two.getAxis(1)), toCenter, 13, ref pen, ref best)) return 0;
+            if (!tryAxis(one, two, TrickyMath.VectorProduct(one.getAxis(2), two.getAxis(2)), toCenter, 14, ref pen, ref best)) return 0;
 
 
 
@@ -345,15 +345,15 @@ namespace Forever.Physics.Collide
                 int twoAxisIndex = best % 3;
                 Vector3 oneAxis = one.getAxis(oneAxisIndex);
                 Vector3 twoAxis = two.getAxis(twoAxisIndex);
-                Vector3 axis = TrickyMathHelper.VectorProduct(oneAxis, twoAxis);
+                Vector3 axis = TrickyMath.VectorProduct(oneAxis, twoAxis);
                 axis.Normalize();
                 if (Vector3.Dot(axis, toCenter) > 0)
                 {
                     axis *= -1f;
                 }
 
-                float[] ptOnOneEdge = TrickyMathHelper.Vector3ToFloatArray(one.HalfSizes);
-                float[] ptOnTwoEdge = TrickyMathHelper.Vector3ToFloatArray(two.HalfSizes);
+                float[] ptOnOneEdge = TrickyMath.Vector3ToFloatArray(one.HalfSizes);
+                float[] ptOnTwoEdge = TrickyMath.Vector3ToFloatArray(two.HalfSizes);
 
                 for (int i = 0; i < 3; i++)
                 {
@@ -377,17 +377,17 @@ namespace Forever.Physics.Collide
                 }
 
                 Vector3 vertexOnOneEdge = Vector3.Transform(
-                                               TrickyMathHelper.FloatArrayToVector3(ptOnOneEdge),
+                                               TrickyMath.FloatArrayToVector3(ptOnOneEdge),
                                                one.Transform
                                                );
 
                 Vector3 vertexOnTwoEdge = Vector3.Transform(
-                                               TrickyMathHelper.FloatArrayToVector3(ptOnTwoEdge),
+                                               TrickyMath.FloatArrayToVector3(ptOnTwoEdge),
                                                two.Transform
                                                );
 
-                float[] oneHalfSizes = TrickyMathHelper.Vector3ToFloatArray(one.HalfSizes);
-                float[] twoHalfSizes = TrickyMathHelper.Vector3ToFloatArray(two.HalfSizes);
+                float[] oneHalfSizes = TrickyMath.Vector3ToFloatArray(one.HalfSizes);
+                float[] twoHalfSizes = TrickyMath.Vector3ToFloatArray(two.HalfSizes);
                 Vector3 vertex = contactPoint(
                         vertexOnOneEdge, oneAxis, oneHalfSizes[oneAxisIndex],
                         vertexOnTwoEdge, twoAxis, twoHalfSizes[twoAxisIndex],
@@ -435,7 +435,7 @@ namespace Forever.Physics.Collide
 
             
             // Zero denominator indicates parrallel lines
-            if (TrickyMathHelper.Abs(denom) < 0.0001f) {
+            if (TrickyMath.Abs(denom) < 0.0001f) {
                 return useOne?pOne:pTwo;
             }
 
@@ -740,7 +740,7 @@ namespace Forever.Physics.Collide
 
             dist = (closest - relCenter).Length();
             
-            if (dist > sph.Radius && !TrickyMathHelper.AlmostEquals(0f, dist - sph.Radius)) return 0;
+            if (dist > sph.Radius && !TrickyMath.AlmostEquals(0f, dist - sph.Radius)) return 0;
 
 
             Vector3 closestWorld = Vector3.Transform(closest, box.Transform);

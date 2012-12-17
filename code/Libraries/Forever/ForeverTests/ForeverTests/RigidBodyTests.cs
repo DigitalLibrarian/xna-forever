@@ -343,7 +343,7 @@ namespace ForeverTests
             thumpResultantTorque = Vector3.Transform(thumpResultantTorque, body.InverseInertiaTensorWorld);
             totalTorque += thumpResultantTorque;
             //Assert.AreEqual(totalTorque, body.AngularMomentum);
-            bool areSame = TrickyMathHelper.CloseEnoughToBeSame(totalTorque, body.AngularMomentum, 0.05f);
+            bool areSame = TrickyMath.CloseEnoughToBeSame(totalTorque, body.AngularMomentum, 0.05f);
             Assert.True( areSame );
 
             //Now if we turn on Damping, it'll  bleed back to zero

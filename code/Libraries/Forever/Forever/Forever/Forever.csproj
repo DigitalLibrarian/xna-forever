@@ -117,7 +117,7 @@
     <Compile Include="Physics\Collide\ContactResolver.cs" />
     <Compile Include="Physics\Collide\IntersectionTests.cs" />
     <Compile Include="Physics\ForceGen\WhenAwakeFG.cs" />
-    <Compile Include="TrickyMathHelper.cs" />
+    <Compile Include="TrickyMath.cs" />
     <Compile Include="NaNny.cs" />
     <Compile Include="Physics\Collide\CollisionDetector.cs" />
     <Compile Include="Physics\Collide\Contact.cs" />

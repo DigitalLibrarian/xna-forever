@@ -60,12 +60,12 @@ namespace Forever.Demos
             IRigidBody body = ballEntity.Body;
 
             Random rand = new Random();
-            Vector3 direction = TrickyMathHelper.RandVector(rand);
+            Vector3 direction = TrickyMath.RandVector(rand);
             direction.Normalize();
             float forceMag = 0.0005f;
             Vector3 force = direction * forceMag;
 
-            Vector3 bodyPoint = TrickyMathHelper.RandVector(rand);
+            Vector3 bodyPoint = TrickyMath.RandVector(rand);
             bodyPoint.Normalize();
             bodyPoint *= BallRadius;
             

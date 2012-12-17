@@ -83,9 +83,9 @@ namespace Forever.Physics.Collide
                                 {
                                     
                                     deltaPosition = linearChange[d] 
-                                        + TrickyMathHelper.VectorProduct(angularChange[d], contact.RelativeContactPositions[b]);
+                                        + TrickyMath.VectorProduct(angularChange[d], contact.RelativeContactPositions[b]);
                                        
-                                    contact.Penetration += TrickyMathHelper.ScalarProduct(deltaPosition, contact.Normal  ) * (b == 0 ? -1f : 1f);
+                                    contact.Penetration += TrickyMath.ScalarProduct(deltaPosition, contact.Normal  ) * (b == 0 ? -1f : 1f);
                                 }
                             }
                         }
@@ -133,7 +133,7 @@ namespace Forever.Physics.Collide
                                 {
 
                                     deltaVel = velocityChange[d]
-                                        + TrickyMathHelper.VectorProduct(rotationChange[d], contact.RelativeContactPositions[b]);
+                                        + TrickyMath.VectorProduct(rotationChange[d], contact.RelativeContactPositions[b]);
 
                                     contact.ContactVelocity +=
                                         Vector3.Transform(deltaVel, Matrix.Transpose(contact.ContactWorld)) * (b == 0 ? -1 : 1);

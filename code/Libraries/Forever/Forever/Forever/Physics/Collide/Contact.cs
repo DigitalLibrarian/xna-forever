@@ -92,9 +92,9 @@ namespace Forever.Physics.Collide
         Vector3[] contactTangent = new Vector3[2];
         float sWas;
         bool top = false;
-        if (TrickyMathHelper.Abs(Normal.X) > TrickyMathHelper.Abs(Normal.Y))
+        if (TrickyMath.Abs(Normal.X) > TrickyMath.Abs(Normal.Y))
         {
-            float s = 1f / TrickyMathHelper.Sqrt(Normal.Z * Normal.Z + Normal.X * Normal.X);
+            float s = 1f / TrickyMath.Sqrt(Normal.Z * Normal.Z + Normal.X * Normal.X);
             sWas = s;
             top = true;
             contactTangent[0] = new Vector3(
@@ -112,7 +112,7 @@ namespace Forever.Physics.Collide
         }
         else
         {
-            float s = 1f / TrickyMathHelper.Sqrt(Normal.Z * Normal.Z + Normal.Y * Normal.Y);
+            float s = 1f / TrickyMath.Sqrt(Normal.Z * Normal.Z + Normal.Y * Normal.Y);
             sWas = s;
             contactTangent[0] = new Vector3(
                 0f,
@@ -142,7 +142,7 @@ namespace Forever.Physics.Collide
     public Vector3 CalcLocalVelocity(int bodyIndex, float duration)
     {
         IRigidBody body = Bodies[bodyIndex];
-        Vector3 velocity = TrickyMathHelper.VectorProduct(body.Rotation, relativeContactPositions[bodyIndex]);
+        Vector3 velocity = TrickyMath.VectorProduct(body.Rotation, relativeContactPositions[bodyIndex]);
         velocity += body.Velocity;
 
         Matrix inverseWorld = Matrix.Transpose(ContactWorld);
@@ -178,7 +178,7 @@ namespace Forever.Physics.Collide
 
         float effectRet = Restitution;
 
-        if (TrickyMathHelper.Abs(ContactVelocity.X) < veloLimit)
+        if (TrickyMath.Abs(ContactVelocity.X) < veloLimit)
         {
             effectRet = 0f;
         }
@@ -211,10 +211,10 @@ namespace Forever.Physics.Collide
             {
                 Matrix inverseInertiaTensor = body.InverseInertiaTensor;
 
-                Vector3 angularInertiaWorld = TrickyMathHelper.VectorProduct(RelativeContactPositions[bodyIndex], Point);
+                Vector3 angularInertiaWorld = TrickyMath.VectorProduct(RelativeContactPositions[bodyIndex], Point);
                 angularInertiaWorld = Vector3.Transform(angularInertiaWorld, inverseInertiaTensor);
-                angularInertiaWorld = TrickyMathHelper.VectorProduct(angularInertiaWorld, RelativeContactPositions[bodyIndex]);
-                angularInertia[bodyIndex] = TrickyMathHelper.ScalarProduct(angularInertiaWorld, Point);
+                angularInertiaWorld = TrickyMath.VectorProduct(angularInertiaWorld, RelativeContactPositions[bodyIndex]);
+                angularInertia[bodyIndex] = TrickyMath.ScalarProduct(angularInertiaWorld, Point);
 
                 linearInertia[bodyIndex] = body.InverseMass;
                 totalInertia += linearInertia[bodyIndex] + angularInertia[bodyIndex];
@@ -232,7 +232,7 @@ namespace Forever.Physics.Collide
 
 
                 Vector3 projection = RelativeContactPositions[bodyIndex];
-                projection += TrickyMathHelper.ScalarProduct(RelativeContactPositions[bodyIndex], Normal) * -Normal;
+                projection += TrickyMath.ScalarProduct(RelativeContactPositions[bodyIndex], Normal) * -Normal;
 
                 float maxMag = angularLimit * projection.Length();
                 if (angularMove[bodyIndex] < -maxMag)
@@ -254,7 +254,7 @@ namespace Forever.Physics.Collide
                 }
                 else
                 {
-                    Vector3 targetAngularDirection = TrickyMathHelper.VectorProduct(RelativeContactPositions[bodyIndex], Point);
+                    Vector3 targetAngularDirection = TrickyMath.VectorProduct(RelativeContactPositions[bodyIndex], Point);
                     Matrix inverseInertiaTensor = Matrix.Transpose(body.InertiaTensorWorld);
                     angularChange[bodyIndex] =
                         Vector3.Transform(targetAngularDirection, inverseInertiaTensor) * (angularMove[bodyIndex] / angularInertia[bodyIndex]);
@@ -271,7 +271,7 @@ namespace Forever.Physics.Collide
                 Vector3 rotation = angularMove[bodyIndex] * Normal;
 
 
-                q = TrickyMathHelper.AddVector(q, rotation);
+                q = TrickyMath.AddVector(q, rotation);
                 body.Orientation = q;
 
                 if (!body.Awake)
@@ -349,20 +349,20 @@ namespace Forever.Physics.Collide
 
     private Vector3 CalculateFrictionlessUnitImpulse(Matrix[] inverseInertiaTensor)
     {
-        Vector3 deltaVelWorld = TrickyMathHelper.VectorProduct(RelativeContactPositions[0], Normal);
+        Vector3 deltaVelWorld = TrickyMath.VectorProduct(RelativeContactPositions[0], Normal);
         deltaVelWorld = Vector3.Transform(deltaVelWorld, inverseInertiaTensor[0]);
-        deltaVelWorld = TrickyMathHelper.VectorProduct(deltaVelWorld, RelativeContactPositions[0]);
+        deltaVelWorld = TrickyMath.VectorProduct(deltaVelWorld, RelativeContactPositions[0]);
 
-        float deltaVelocity = TrickyMathHelper.ScalarProduct(deltaVelWorld, Normal);
+        float deltaVelocity = TrickyMath.ScalarProduct(deltaVelWorld, Normal);
         deltaVelocity += Bodies[0].InverseMass;
 
         if (Bodies[1] != null)
         {
-            deltaVelWorld = TrickyMathHelper.VectorProduct(RelativeContactPositions[1], Normal);;
+            deltaVelWorld = TrickyMath.VectorProduct(RelativeContactPositions[1], Normal);;
             deltaVelWorld = Vector3.Transform(deltaVelWorld, inverseInertiaTensor[1]);
-            deltaVelWorld = TrickyMathHelper.VectorProduct(deltaVelWorld, RelativeContactPositions[1]);
+            deltaVelWorld = TrickyMath.VectorProduct(deltaVelWorld, RelativeContactPositions[1]);
 
-            deltaVelocity += TrickyMathHelper.ScalarProduct(deltaVelWorld, Normal);
+            deltaVelocity += TrickyMath.ScalarProduct(deltaVelWorld, Normal);
             deltaVelocity += Bodies[1].InverseMass;
         }
         Vector3 result;

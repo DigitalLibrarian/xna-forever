@@ -347,7 +347,7 @@ namespace Forever.Demos
         }
         public void Smack(ModelEntity left, float forceMag, float radius)
         {
-            left.addForce(TrickyMathHelper.RandVector(Random, forceMag), TrickyMathHelper.RandVector(Random, radius));
+            left.addForce(TrickyMath.RandVector(Random, forceMag), TrickyMath.RandVector(Random, radius));
         }
 
 

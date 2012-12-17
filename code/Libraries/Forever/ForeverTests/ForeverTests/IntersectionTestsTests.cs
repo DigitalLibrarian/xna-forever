@@ -211,7 +211,7 @@ namespace ForeverTests
 
             Assert.AreEqual(Vector3.Zero, contact1.Point);
             Assert.True(
-                TrickyMathHelper.AlmostEquals(0.1f, contact1.Penetration)
+                TrickyMath.AlmostEquals(0.1f, contact1.Penetration)
                 );
             Assert.AreEqual(planeNormal, contact1.Normal);
         }
@@ -308,12 +308,12 @@ namespace ForeverTests
             contact1 = data.contacts[0];
 
             Assert.True(
-                TrickyMathHelper.AlmostEquals(0f, contact1.Penetration)
+                TrickyMath.AlmostEquals(0f, contact1.Penetration)
                 );
             
             Assert.AreEqual(new Vector3(1f, 1f, 1f), contact1.Point);
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(
+                TrickyMath.CloseEnoughToBeSame(
                 new Vector3(0.5773503f, 0.5773503f, 0.5773503f),
                 contact1.Normal)
                 );
@@ -350,12 +350,12 @@ namespace ForeverTests
             contact1 = data.contacts[0];
 
             Assert.True(
-                TrickyMathHelper.AlmostEquals(0f, contact1.Penetration)
+                TrickyMath.AlmostEquals(0f, contact1.Penetration)
                 );
             
             Assert.AreEqual(new Vector3(0f, 1f, 1f), contact1.Point);
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(
+                TrickyMath.CloseEnoughToBeSame(
                 new Vector3(0f, 0.7071068f, 0.7071068f),
                 contact1.Normal)
                 );
@@ -458,11 +458,11 @@ namespace ForeverTests
 
 
             Assert.True(
-                TrickyMathHelper.AlmostEquals(0.7071067f, contact1.Penetration)
+                TrickyMath.AlmostEquals(0.7071067f, contact1.Penetration)
             );
 
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(
+                TrickyMath.CloseEnoughToBeSame(
                     new Vector3(-0.2071069f, 0f, -0.2071068f),
                     contact1.Point));
                     
@@ -471,7 +471,7 @@ namespace ForeverTests
 
             ////unit box centered at y=sqrt(2) and rotated 45 degrees on each axis
 
-            boxMatrix = Matrix.CreateFromYawPitchRoll(angle, angle, angle) * Matrix.CreateTranslation(new Vector3(0f, TrickyMathHelper.Sqrt(2), 0f));
+            boxMatrix = Matrix.CreateFromYawPitchRoll(angle, angle, angle) * Matrix.CreateTranslation(new Vector3(0f, TrickyMath.Sqrt(2), 0f));
 
             box = new Box(new NoBody(boxMatrix), Matrix.Identity, new Vector3(1f, 1f, 1f));
 
@@ -486,13 +486,13 @@ namespace ForeverTests
 
 
             Assert.True(
-                TrickyMathHelper.AlmostEquals(0.292893142f,contact1.Penetration)
+                TrickyMath.AlmostEquals(0.292893142f,contact1.Penetration)
                
             );
             
 
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(
+                TrickyMath.CloseEnoughToBeSame(
                     new Vector3(-0.2071069f, 0f, -0.2071068f), 
                     contact1.Point
                 )
@@ -629,7 +629,7 @@ namespace ForeverTests
             contact = data.contacts[0];
 
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(contact.Normal, new Vector3(-0.7071068f, 0, 0.7071068f) )
+                TrickyMath.CloseEnoughToBeSame(contact.Normal, new Vector3(-0.7071068f, 0, 0.7071068f) )
             );
 
             /////////////////////////////////////////////////////point@+,0,0 after box is rotated other direction
@@ -644,7 +644,7 @@ namespace ForeverTests
             contact = data.contacts[0];
 
             Assert.True(
-                TrickyMathHelper.CloseEnoughToBeSame(contact.Normal, new Vector3(-0.7071068f, 0, -0.7071068f))
+                TrickyMath.CloseEnoughToBeSame(contact.Normal, new Vector3(-0.7071068f, 0, -0.7071068f))
             );
 
         }

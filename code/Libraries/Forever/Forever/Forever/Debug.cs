@@ -70,7 +70,7 @@ namespace Forever
         {
             return false;
         }
-        if (!TrickyMathHelper.AlmostEquals(v.Length(), 1f))
+        if (!TrickyMath.AlmostEquals(v.Length(), 1f))
         {
             Report("Non normal normal");
             return false;

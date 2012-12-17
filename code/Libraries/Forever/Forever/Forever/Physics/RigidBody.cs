@@ -298,7 +298,7 @@ namespace Forever.Physics
     {
         if (CanSleep && Awake)
         {
-            float currentMotion = TrickyMathHelper.ScalarProduct(Velocity, Velocity) + TrickyMathHelper.ScalarProduct(Rotation, Rotation);
+            float currentMotion = TrickyMath.ScalarProduct(Velocity, Velocity) + TrickyMath.ScalarProduct(Rotation, Rotation);
 
             float bias = (float)Math.Pow(0.9, (double)duration);
             float newMotion = bias * _motion + (1 - bias) * currentMotion;
