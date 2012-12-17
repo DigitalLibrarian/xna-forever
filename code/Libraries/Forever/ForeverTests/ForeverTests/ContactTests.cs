@@ -13,12 +13,17 @@ namespace ForeverTests
         [Test]
         public void Contact_XAxis()
         {
-            NoBody bodyZero = new NoBody();
-            bodyZero.Position = Vector3.Right;
+            NoBody bodyZero = new NoBody(Vector3.Right);
+
             bodyZero.Velocity = Vector3.Left;
-            NoBody bodyOne = new NoBody();
-            bodyOne.Position = Vector3.Left * .9f;
+            bodyZero.Mass = 1f;
+            bodyZero.calculateDerivedData();
+
+            NoBody bodyOne = new NoBody(Vector3.Left * .9f);
+
             bodyOne.Velocity = Vector3.Right;
+            bodyOne.Mass = 1f;
+            bodyOne.calculateDerivedData();
 
             Contact contact = new Contact();
             contact.Bodies[0] = bodyZero;
@@ -29,6 +34,7 @@ namespace ForeverTests
             contact.Restitution = 1f;
             contact.Friction = 0f;
             contact.Normal = Vector3.Right;
+
 
             contact.ReCalc(1f);
 
@@ -88,255 +94,110 @@ namespace ForeverTests
             Assert.AreEqual(
                 Vector3.Right,
                 bodyZero.Velocity);
+            Assert.AreEqual(Vector3.Zero, bodyZero.Rotation);
 
             Assert.AreEqual(
                 Vector3.Left,
                 bodyOne.Velocity);
-
-            int brak = 3;
+            Assert.AreEqual(Vector3.Zero, bodyOne.Rotation);
         }
 
+        [Test]
+        public void Contact_BoxSpinningOnYAxisFallsOnToXZPlane()
+        {
+            // X-Z plane
+            NoBody planeBody = new NoBody(Vector3.Zero);
+            planeBody.InverseMass = 0f; //infinite mass
+            Forever.Physics.Collide.Plane plane = new Forever.Physics.Collide.Plane(planeBody, Vector3.Zero, Vector3.Up);
+
+            planeBody.calculateDerivedData();
+
+            // Spinning box colliding with the plane
+            NoBody boxBody = new NoBody(Vector3.Up * 0.95f);
+
+            boxBody.Mass = 1f;
+            boxBody.Rotation = new Vector3(0f, 0.01f, 0f);
+            boxBody.Velocity = new Vector3(0f, -1f, 0f);
+            boxBody.calculateDerivedData();
+            Box box = new Box(boxBody, Matrix.Identity, new Vector3(1f, 1f, 1f));
+
+
+            Contact contact = new Contact();
+            contact.Bodies[0] = planeBody;
+            contact.Bodies[1] = boxBody;
+
+            contact.Point = Vector3.Zero;
+            contact.Penetration = 0.05f;
+            contact.Restitution = 1f;
+            contact.Friction = 0f;
+            contact.Normal = Vector3.Up;
+
+
+            contact.ReCalc(1f);
+
+            Assert.AreEqual(Vector3.Zero, contact.CalcLocalVelocity(0, 1f));
+            Assert.AreEqual(Vector3.Left, contact.CalcLocalVelocity(1, 1f));
+
+            Assert.AreEqual(Vector3.Zero, contact.RelativeContactPositions[0]);
+            Assert.AreEqual(Vector3.Up * 0.95f, contact.RelativeContactPositions[1]);
+            Assert.AreEqual(Vector3.Right, contact.ContactVelocity);
+
+
+            // Position Change
+
+            Vector3[] linearChange = new Vector3[2];
+            Vector3[] angularChange = new Vector3[2];
+            contact.ApplyPositionChange(
+                ref linearChange, ref angularChange, contact.Penetration);
+
+            Assert.AreEqual(Vector3.Zero, angularChange[0], "Zero angular change for object 0");
+            Assert.AreEqual(Vector3.Zero, angularChange[1], "Zero angular change for object 1");
+
+            Assert.AreEqual(new Vector3(0.0f, 0f, 0f), linearChange[0],
+                "Body 0 is not pushed at all because it has infinite mass");
+            Assert.AreEqual(new Vector3(0f, -0.05f, 0f), linearChange[1],
+                "Body 1 is pushed up (forward in contact direction) by half penetration");
+
+            //Velocity Change
+
+
+            Vector3[] velocityChange = new Vector3[2];
+            Vector3[] rotationChange = new Vector3[2];
+
+
+            contact.ApplyVelocityChange(ref velocityChange, ref rotationChange);
+
+
+            Assert.AreEqual(
+                Vector3.Zero,
+                rotationChange[0],
+                "Zero rotation change for object 0");
+
+            Assert.AreEqual(
+                Vector3.Zero,
+                rotationChange[1],
+                "Zero rotation change for object 1");
+
+            Assert.AreEqual(
+                Vector3.Zero,
+                velocityChange[0],
+                "Zero velocity applied to body 0");
+
+            Assert.AreEqual(
+                Vector3.Up * 2f,
+                velocityChange[1],
+                "Counter velocity applied to body 1");
+        }
 
         #region IRigidBody player
-        private class NoBody : IRigidBody
+        private class NoBody : Forever.Physics.RigidBody
         {
-
-            public NoBody()
+            public NoBody(Vector3 pos)
+                : base(pos)
             {
-                Position = Vector3.Zero;
-                Velocity = Vector3.Zero;
-                LastAccel = Vector3.Zero;
-                Acceler = Vector3.Zero;
-                Rotation = Vector3.Zero;
-                Orientation = Quaternion.Identity;
 
-                Awake = true;
-                Mass = 1;
             }
 
-
-            public Microsoft.Xna.Framework.Vector3 Position
-            {
-                get;
-                set;
-            }
-
-            public Microsoft.Xna.Framework.Vector3 Velocity
-            {
-                get;
-                set;
-            }
-
-            public Microsoft.Xna.Framework.Vector3 LastAccel
-            {
-                get;
-                set;
-            }
-
-
-            public Microsoft.Xna.Framework.Vector3 Acceler
-            {
-                get;
-                set;
-            }
-
-
-            public Microsoft.Xna.Framework.Vector3 Rotation
-            {
-                get;
-                set;
-            }
-
-
-
-            public bool Awake
-            {
-                get;
-                set;
-            }
-
-
-            public Microsoft.Xna.Framework.Matrix InertiaTensor
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public Microsoft.Xna.Framework.Matrix InertiaTensorWorld
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public Microsoft.Xna.Framework.Matrix InverseInertiaTensor
-            {
-                get
-                {
-                    return Matrix.Identity;
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public Microsoft.Xna.Framework.Matrix InverseInertiaTensorWorld
-            {
-                get { return Matrix.Identity; }
-            }
-
-            public Microsoft.Xna.Framework.Matrix World
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public Microsoft.Xna.Framework.Quaternion Orientation
-            {
-                get;
-                set;
-            }
-
-            public Microsoft.Xna.Framework.Vector3 AngularMomentum
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public Microsoft.Xna.Framework.Vector3 LinearMomentum
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public float Mass
-            {
-                get;
-                set;
-            }
-
-            public float InverseMass
-            {
-                get
-                {
-                    return 1f / Mass;
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public bool HasFiniteMass
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public float LinearDamping
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public float AngularDamping
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-           
-
-
-
-          
-
-
-            public void addTorque(Microsoft.Xna.Framework.Vector3 torque)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void addForce(Microsoft.Xna.Framework.Vector3 force, Microsoft.Xna.Framework.Vector3 point)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void clearAccumulators()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void integrate(float duration)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void addVelocity(Microsoft.Xna.Framework.Vector3 velo)
-            {
-                Velocity += velo;
-            }
-
-            public void addRotation(Microsoft.Xna.Framework.Vector3 rot)
-            {
-                Rotation += rot;
-            }
-
-            public Microsoft.Xna.Framework.Vector3 Up
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public Microsoft.Xna.Framework.Vector3 Right
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public Microsoft.Xna.Framework.Vector3 Forward
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public void addForce(Microsoft.Xna.Framework.Vector3 force)
-            {
-                throw new NotImplementedException();
-            }
-
-            public Microsoft.Xna.Framework.Vector3 CenterOfMass
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public void Translate(Microsoft.Xna.Framework.Vector3 translation)
-            {
-                throw new NotImplementedException();
-            }
-
-
-            public bool CanSleep
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
         }
         #endregion
     }

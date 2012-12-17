@@ -145,7 +145,7 @@ namespace Forever.Physics
     }
 
     Vector3 _rotation;
-      public Vector3 Rotation { get { return _rotation; } }
+    public Vector3 Rotation { get { return _rotation; } set { _rotation = value; } }
     public Vector3 Velocity { get { return _velocity; } set { _velocity = value; } }
     public Vector3 AngularMomentum { get { return _rotation * Mass; }  }
     public Vector3 LinearMomentum { get { return _velocity * Mass; } }
@@ -226,12 +226,15 @@ namespace Forever.Physics
       Debug.Sanity(_orientation);
       Debug.Sanity(_transform_matrix);
 
-      this._transform_matrix =  Matrix.CreateFromQuaternion(_orientation) * Matrix.CreateTranslation(this._position) ;
+      this._transform_matrix =  
+          Matrix.CreateFromQuaternion(_orientation) * Matrix.CreateTranslation(this._position) ;
 
       Debug.Sanity(_transform_matrix);
         
       Matrix orientMatrix = Matrix.CreateFromQuaternion(_orientation);
-      _inverse_inertia_tensor_world = orientMatrix * _inverse_inertia_tensor * Matrix.Transpose(orientMatrix);
+
+      _inverse_inertia_tensor_world = 
+          orientMatrix * _inverse_inertia_tensor * Matrix.Transpose(orientMatrix);
            
 
 

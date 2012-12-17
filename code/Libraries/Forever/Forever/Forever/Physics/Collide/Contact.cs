@@ -159,13 +159,7 @@ namespace Forever.Physics.Collide
         return contactVelo;
     }
 
-    private Vector3 GetBodyVelocityOnContactAxis(IRigidBody body)
-    {
-        Vector3 velo = body.Velocity;
-        return TrickyMathHelper.Project(velo, Normal);
-        
-    }
-
+    
     public void CalcDesiredDeltaVelocity(float duration)
     {
         float veloLimit = .1f;
@@ -235,6 +229,7 @@ namespace Forever.Physics.Collide
                 float sign = bodyIndex == 0 ? 1f : -1f;
                 angularMove[bodyIndex] = sign * penetration * (angularInertia[bodyIndex] / totalInertia);
                 linearMove[bodyIndex] = sign * penetration * (linearInertia[bodyIndex] / totalInertia);
+
 
                 Vector3 projection = RelativeContactPositions[bodyIndex];
                 projection += TrickyMathHelper.ScalarProduct(RelativeContactPositions[bodyIndex], Normal) * -Normal;
