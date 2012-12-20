@@ -12,10 +12,10 @@ namespace Forever.Physics.Collide
 {
     public class ContactResolver
     {
-        public float PenetrationEpsilon = 0.000025f;
-        public float VelocityEpisilon = 0.0000001f;
-        public int PositionIterations = 1;
-        public int VelocityIterations = 1;
+        public float PenetrationEpsilon { get; set; }// = 0.000026f;
+        public float VelocityEpisilon { get; set; } //= 0.0000001f;
+        public int PositionIterations { get; set; } // 1;
+        public int VelocityIterations { get; set; } // 10
 
         [EntityInspector("Position Iterations: ")]
         public long TotalPositionIterationsExecuted { get; set; }
@@ -25,6 +25,17 @@ namespace Forever.Physics.Collide
         public float HighestDDL { get; set; }
         [EntityInspector("Overall Highest Penetration: ")]
         public float HighestPenetration { get; set; }
+
+        public ContactResolver(
+            int positionIterations, int velocityIterations,
+            float penetrationEpsilon, float velocityEpisilon)
+        {
+            PositionIterations = positionIterations;
+            VelocityIterations = velocityIterations;
+            PenetrationEpsilon = penetrationEpsilon;
+            VelocityEpisilon = velocityEpisilon;
+        }
+
 
 
         public void FullContactResolution(List<Contact> contacts, float duration)
@@ -86,6 +97,7 @@ namespace Forever.Physics.Collide
                                         + TrickyMath.VectorProduct(angularChange[d], contact.RelativeContactPositions[b]);
                                        
                                     contact.Penetration += TrickyMath.ScalarProduct(deltaPosition, contact.Normal  ) * (b == 0 ? -1f : 1f);
+                                    
                                 }
                             }
                         }
@@ -137,6 +149,7 @@ namespace Forever.Physics.Collide
 
                                     contact.ContactVelocity +=
                                         Vector3.Transform(deltaVel, Matrix.Transpose(contact.ContactWorld)) * (b == 0 ? -1 : 1);
+                                    contact.ReCalc(duration);
                                     
                                 }
 

@@ -125,7 +125,6 @@
     <Compile Include="Physics\Collide\PrimitiveHelper.cs" />
     <Compile Include="Physics\ForceGen\TowardsBodyFG.cs" />
     <Compile Include="Physics\ForceRegistry.cs" />
-    <Compile Include="Physics\MadMatrix.cs" />
     <Compile Include="Physics\Particle.cs" />
     <Compile Include="Physics\RigidBody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

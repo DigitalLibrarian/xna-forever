@@ -691,6 +691,7 @@ namespace Forever.Physics.Collide
                     contact.Normal = plane.Normal;
                     contact.Penetration = vertexDist - plane.Offset;//TrickyMathHelper.Abs(plane.Offset - vertexDist);
                     contact.Restitution = data.restitution;
+                    contact.Friction = data.friction;
                     data.contacts.Add(contact);
                     contacts_found++;
                 }

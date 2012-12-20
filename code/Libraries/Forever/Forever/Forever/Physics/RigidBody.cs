@@ -13,7 +13,8 @@ namespace Forever.Physics
   public class RigidBody : IRigidBody
   {
 
-      private const float SleepEpsilon = 0.000009f;
+      private const float SleepEpsilon = 0.000027f;
+      private const double BaseOfMotionTrackingBias = 0.99f;
 
       #region Body Space Basis
       [EntityInspector("Body Forward")]
@@ -300,7 +301,7 @@ namespace Forever.Physics
         {
             float currentMotion = TrickyMath.ScalarProduct(Velocity, Velocity) + TrickyMath.ScalarProduct(Rotation, Rotation);
 
-            float bias = (float)Math.Pow(0.9, (double)duration);
+            float bias = (float)Math.Pow(BaseOfMotionTrackingBias, (double)duration);
             float newMotion = bias * _motion + (1 - bias) * currentMotion;
             if (newMotion > 0 && newMotion < this.SmallestPositiveMotion)
             {
@@ -312,9 +313,9 @@ namespace Forever.Physics
                 _awake = false;
                 _motion = 0;
             }
-            else if (newMotion > 10 * SleepEpsilon)
+            else if (newMotion > 100 * SleepEpsilon)
             {
-                _motion = 10 * SleepEpsilon;
+                _motion = 100 * SleepEpsilon;
             }
 
             _motion = newMotion;

@@ -23,6 +23,7 @@ namespace Forever.Demos
         public float DefaultSphereRadius { get; set; }
         public float DefaultSphereMass { get; set; }
         public float DefaultRestitution { get; set; }
+        public float DefaultFriction { get; set; }
 
 
         public ModelEntity EntityOne { get; set; }
@@ -41,10 +42,20 @@ namespace Forever.Demos
         #region Constructors
         public CollideDemo()
             : this(CollideType.Sphere, CollideType.Sphere) { }
-
+        
         public CollideDemo(CollideType primOne, CollideType primTwo) : base()
         {
-            ContactResolver = new Physics.Collide.ContactResolver();
+
+            DefaultRestitution = 0.75f;
+            DefaultFriction = 0.0000f;// 1f;
+            int positionIterations = 100;
+            int velocityIterations = 20;
+
+            float penetrationEpsilon = 0.0000f;// 26f;
+            float velocityEpisilon = 0.00000f;// 01f;
+            ContactResolver = new ContactResolver(
+                positionIterations, velocityIterations,
+                penetrationEpsilon, velocityEpisilon);
 
             primOneCollideType = primOne;
             primTwoCollideType = primTwo;
@@ -56,7 +67,6 @@ namespace Forever.Demos
             DefaultSpawnPosTwo = new Vector3(DefaultSphereRadius * 3.51f, 10.001f, 0.001f);
 
            
-            DefaultRestitution = 1f;
             LastContact = new Contact();
 
         }
@@ -80,9 +90,7 @@ namespace Forever.Demos
         public override void AddEntity(IGameEntity ent)
         {
             this.ForceRegistry.Add(ent, new WhenAwakeFG(Vector3.Down * 0.0000004f));
-            //this.ForceRegistry.Add(ent, new TowardsBodyFG(CamBody, 0.000004f));
-
-            
+                        
             base.AddEntity(ent);
         }
 
@@ -94,10 +102,11 @@ namespace Forever.Demos
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-           
-            EntityOne.Body.addTorque(new Vector3(0.0f, 0.001f, 0.0f));
-            EntityTwo.Body.addTorque(new Vector3(0.001f, 0f, 0.00f));
 
+            //EntityOne.Body.addTorque(new Vector3(0.0f, 0.00001f, 0.0f));
+            //EntityTwo.Body.addTorque(new Vector3(0.00001f, 0f, 0.00f));
+
+            
             
             /*
             // Thump Entity One towards Entity Two by applying a force on it's surface
@@ -223,6 +232,7 @@ namespace Forever.Demos
  
             CollisionData data = new CollisionData();
             data.restitution = this.DefaultRestitution;
+            data.friction = this.DefaultFriction;
             detect.FindContacts(left.GeometryData.Prim, right.GeometryData.Prim, data);
             return data;
         }
@@ -296,5 +306,12 @@ namespace Forever.Demos
         #endregion
 
     }
+
+
+
+
+
+
+
 }
 

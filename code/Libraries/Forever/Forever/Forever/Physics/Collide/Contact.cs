@@ -162,7 +162,7 @@ namespace Forever.Physics.Collide
     
     public void CalcDesiredDeltaVelocity(float duration)
     {
-        float veloLimit = .1f;
+        float veloLimit = 0.0001f;
 
         float veloFromAcc = 0f;
 
@@ -185,11 +185,9 @@ namespace Forever.Physics.Collide
 
         // Combine the bounce velocity with the removed
         // acceleration velocity.
-
         desiredDeltaVelocity =
-            -ContactVelocity.X
-            - (effectRet * (ContactVelocity.X - veloFromAcc));
-            //- ((1f - effectRet) * (ContactVelocity.X - veloFromAcc));
+            -veloFromAcc
+            - ((1f + effectRet) * (ContactVelocity.X - veloFromAcc));
 
     }
 
@@ -310,30 +308,24 @@ namespace Forever.Physics.Collide
         }
         else
         {
-            throw new NotImplementedException("Friction hasn't been implemented yet");
+            impulseContactSpace = CalculateFrictionUnitImpluse(inverseInertiaTensor);
         }
 
         Matrix contactSpaceToWorld = Matrix.Transpose(ContactWorld);
 
         Vector3 impulseWorld = Vector3.Transform(impulseContactSpace, ContactWorld);
-        
         Vector3 impulsiveTorque = Vector3.Cross(this.RelativeContactPositions[0], impulseWorld);
+
         rotationChange[0] = Vector3.Transform(impulsiveTorque, inverseInertiaTensor[0]);
-
-
-
-        //Vector3 momNormal = TrickyMathHelper.Project(Bodies[0].LinearMomentum, Normal);
-
-        velocityChange[0] = (impulseWorld * Bodies[0].InverseMass);// +(-momNormal * Bodies[0].InverseMass);
+        velocityChange[0] = (impulseWorld * Bodies[0].InverseMass);
         
         Bodies[0].addVelocity(velocityChange[0]);
         Bodies[0].addRotation(rotationChange[0]);
 
-        if (Bodies.Length > 1 && Bodies[1] != null)
+        if (Bodies[1] != null)
         {
             impulseContactSpace *= -1f;
             impulseWorld = Vector3.Transform(impulseContactSpace, ContactWorld);
-
             impulsiveTorque = Vector3.Cross(impulseWorld, this.RelativeContactPositions[1]);
 
             rotationChange[1] = Vector3.Transform(impulsiveTorque, inverseInertiaTensor[1]);
@@ -380,6 +372,88 @@ namespace Forever.Physics.Collide
         
     }
 
+
+    private Vector3 CalculateFrictionUnitImpluse(Matrix[] inverseInertiaTensor)
+    {
+        float inverseMass = Bodies[0].InverseMass;
+
+        Matrix impulseToTorque = TrickyMath.CreateSkewSymmetric(RelativeContactPositions[0]);
+
+        Matrix deltaVelWorld = impulseToTorque;
+        deltaVelWorld *= inverseInertiaTensor[0];
+        deltaVelWorld *= impulseToTorque;
+        deltaVelWorld *= -1f;
+
+        if (Bodies[1] != null)
+        {
+            impulseToTorque = TrickyMath.CreateSkewSymmetric(RelativeContactPositions[1]);
+            Matrix deltaVelWorld2 = impulseToTorque;
+            deltaVelWorld2 *= inverseInertiaTensor[1];
+            deltaVelWorld2 *= impulseToTorque;
+            deltaVelWorld2 *= -1f;
+
+            deltaVelWorld += deltaVelWorld2;
+            inverseMass += Bodies[1].InverseMass;
+        }
+
+
+        Matrix deltaVelocity = Matrix.Transpose(ContactWorld);
+        deltaVelocity *= deltaVelWorld;
+        deltaVelocity *= ContactWorld;
+
+
+        deltaVelocity = new Matrix(
+
+            deltaVelocity.M11 + inverseMass, deltaVelocity.M12, deltaVelocity.M13, deltaVelocity.M14,
+
+            deltaVelocity.M21, deltaVelocity.M22 + inverseMass, deltaVelocity.M23, deltaVelocity.M24,
+
+            deltaVelocity.M31, deltaVelocity.M32, deltaVelocity.M33 + inverseMass, deltaVelocity.M34,
+
+            deltaVelocity.M41, deltaVelocity.M42, deltaVelocity.M43, 1f
+
+            );
+
+
+        Matrix impulseMatrix = Matrix.Invert(deltaVelocity);
+
+
+        Vector3 velKill = new Vector3(
+            DesiredDeltaVelocity, -ContactVelocity.Y, -ContactVelocity.Z);
+
+        Vector3 impulseContact = Vector3.Transform(velKill, impulseMatrix);
+
+        float planarImpulse = TrickyMath.Sqrt(
+            impulseContact.Y * impulseContact.Y + 
+            impulseContact.Z * impulseContact.Z
+            );
+
+        // dynamic friction
+        if (planarImpulse > impulseContact.X * Friction)
+        {
+            
+            float x = impulseContact.X;
+            float y = impulseContact.Y;
+            float z = impulseContact.Z;
+
+            y /= planarImpulse;
+            z /= planarImpulse;
+
+            x = deltaVelocity.M11 
+                + deltaVelocity.M21 * Friction * y 
+                + deltaVelocity.M31 * Friction * z;
+
+            x = DesiredDeltaVelocity / x;
+            y *= Friction *x ;
+            z *= Friction *x ;
+
+            impulseContact = new Vector3(x, y, z);
+
+
+        }
+
+        return impulseContact;
+    }
 
     public void MatchAwakeState()
     {

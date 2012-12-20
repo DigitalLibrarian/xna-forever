@@ -24,7 +24,7 @@ namespace Forever.Demos
 
             ScreenState = ScreenState.NoTransitions;
             PropagateDraw = true;
-
+            
 
         }
 
@@ -96,6 +96,7 @@ namespace Forever.Demos
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
+
 
         protected List<string[]> ExtractEntityTableInfo(object entity)
         {

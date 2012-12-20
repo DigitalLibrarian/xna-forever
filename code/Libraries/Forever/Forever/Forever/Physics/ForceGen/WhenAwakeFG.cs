@@ -18,7 +18,8 @@ namespace Forever.Physics.ForceGen
 
         public void updateForce(IPhysicsObject forceTarget, GameTime gameTime)
         {
-            //if (forceTarget.Awake)
+            // Allow target to go to sleep
+            if (forceTarget.Awake)
             {
                 Vector3 appliedForce = Force * forceTarget.Mass;
                 Forever.Interface.ICollideable bodyHaver = forceTarget as ICollideable;
