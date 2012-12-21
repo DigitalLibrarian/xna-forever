@@ -41,8 +41,8 @@ namespace ForeverTests
             Assert.AreEqual(Vector3.Left, contact.CalcLocalVelocity(0, 1f));
             Assert.AreEqual(Vector3.Right, contact.CalcLocalVelocity(1, 1f));
 
-            Assert.AreEqual(Vector3.Right, contact.RelativeContactPositions[0]);
-            Assert.AreEqual(Vector3.Left * 0.9f, contact.RelativeContactPositions[1]);
+            Assert.AreEqual(Vector3.Left, contact.RelativeContactPositions[0]);
+            Assert.AreEqual(Vector3.Right * 0.9f, contact.RelativeContactPositions[1]);
             Assert.AreEqual(new Vector3(-2f, 0f, 0f), contact.ContactVelocity);
 
 
@@ -139,7 +139,7 @@ namespace ForeverTests
             Assert.AreEqual(Vector3.Left, contact.CalcLocalVelocity(1, 1f));
 
             Assert.AreEqual(Vector3.Zero, contact.RelativeContactPositions[0]);
-            Assert.AreEqual(Vector3.Up * 0.95f, contact.RelativeContactPositions[1]);
+            Assert.AreEqual(Vector3.Down * 0.95f, contact.RelativeContactPositions[1]);
             Assert.AreEqual(Vector3.Right, contact.ContactVelocity);
 
 

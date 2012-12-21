@@ -75,12 +75,12 @@ namespace Forever.Physics.Collide
         CalcContactBasis();
 
         relativeContactPositions = new Vector3[2];
-        relativeContactPositions[0] = Bodies[0].Position - Point;
+        relativeContactPositions[0] = Point - Bodies[0].Position;
 
         contactVelocity = CalcLocalVelocity(0, duration);
         if (Bodies[1] != null)
         {
-            relativeContactPositions[1] = Bodies[1].Position - Point;
+            relativeContactPositions[1] = Point - Bodies[1].Position;
             contactVelocity -= CalcLocalVelocity(1, duration);
         }
 
