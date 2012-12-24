@@ -22,8 +22,7 @@ namespace Forever.GameEntities
         {
             this.body = body;
             this.Model = model;
-            //this.Prim = prim;
-
+            
             this.GeometryData = geoData;
             DebugCompass = new DebugCompass(this.CenterOfMass);
             DebugCompass.LoadContent(null);
