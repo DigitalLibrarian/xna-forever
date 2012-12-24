@@ -29,7 +29,7 @@ namespace Forever.Render
         foreach (BasicEffect effect in mesh.Effects)
         {
           effect.EnableDefaultLighting();
-
+          
           effect.View = view;
           effect.Projection = proj;
           effect.World = transforms[mesh.ParentBone.Index] * world;

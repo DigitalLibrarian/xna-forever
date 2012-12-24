@@ -15,7 +15,6 @@ Content\house.xnb
 Content\one-sided-square.xnb
 Content\pointy.xnb
 Content\pyramid.xnb
-Content\sharpCube.xnb
 Content\SkyDome\skydome.xnb
 Content\terrain.xnb
 Content\tower.xnb
@@ -41,3 +40,4 @@ Content\FBX\714238CE\cottus_elec.fbm\cottus_body_0.xnb
 Content\pyramidtex_0.xnb
 Content\ground_0.xnb
 Content\whitesquare.xnb
+Content\sharpCube.xnb

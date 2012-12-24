@@ -22,8 +22,8 @@ namespace Forever.Demos
         public Vector3 DefaultSpawnPosTwo { get; set; }
         public float DefaultSphereRadius { get; set; }
         public float DefaultSphereMass { get; set; }
-        public float DefaultRestitution { get; set; }
-        public float DefaultFriction { get; set; }
+        public float Restitution { get; set; }
+        public float Friction { get; set; }
 
 
         public ModelEntity EntityOne { get; set; }
@@ -39,20 +39,25 @@ namespace Forever.Demos
         CollideType primOneCollideType;
         CollideType primTwoCollideType;
 
+        List<Contact> captured = new List<Contact>();
+        public bool CaptureBodyContacts { get; set; }
+
         #region Constructors
         public CollideDemo()
             : this(CollideType.Sphere, CollideType.Sphere) { }
         
         public CollideDemo(CollideType primOne, CollideType primTwo) : base()
         {
+            // Turn this on to keep a reference to all contacts with both bodies
+            CaptureBodyContacts = false;
 
-            DefaultRestitution = 0.75f;
-            DefaultFriction = 0.0000f;// 1f;
-            int positionIterations = 100;
-            int velocityIterations = 20;
+            Restitution = 0.2f;
+            Friction = 0.0f;// 1f;
+            int positionIterations = 5;
+            int velocityIterations = 5;
 
-            float penetrationEpsilon = 0.0000f;// 26f;
-            float velocityEpisilon = 0.00000f;// 01f;
+            float penetrationEpsilon = 0.0001f;// 26f;
+            float velocityEpisilon = 0.0001f;// 01f;
             ContactResolver = new ContactResolver(
                 positionIterations, velocityIterations,
                 penetrationEpsilon, velocityEpisilon);
@@ -66,6 +71,8 @@ namespace Forever.Demos
             DefaultSpawnPosOne = new Vector3(-DefaultSphereRadius * 3.51f, 10.001f, 0.001f);
             DefaultSpawnPosTwo = new Vector3(DefaultSphereRadius * 3.51f, 10.001f, 0.001f);
 
+            DefaultSpawnPosOne = new Vector3(0f, 10f, 0f);
+            DefaultSpawnPosTwo = new Vector3(-0.5f, 15f, 0f);
            
             LastContact = new Contact();
 
@@ -98,13 +105,15 @@ namespace Forever.Demos
         public override void LoadContent()
         {
             base.LoadContent();
-
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
-
-            //EntityOne.Body.addTorque(new Vector3(0.0f, 0.00001f, 0.0f));
-            //EntityTwo.Body.addTorque(new Vector3(0.00001f, 0f, 0.00f));
+            EntityOne.Body.AngularDamping =  0.99997f;
+            EntityTwo.Body.AngularDamping =  0.99997f;
+            EntityOne.Body.LinearDamping =  0.9999f;
+            EntityTwo.Body.LinearDamping =  0.9999f;
+            //EntityOne.Body.addTorque(new Vector3(0.0f, 0.0001f, 0.0f));
+            EntityTwo.Body.addTorque(new Vector3(0.0001f, 0f, 0.00f));
 
             
             
@@ -196,7 +205,6 @@ namespace Forever.Demos
 
         private void PumpCollisions(float duration)
         {
-
             List<ICollideable> colliders = this.ICollideables;
 
             IEnumerable<ICollideable> gameObjectsLeft = colliders;
@@ -210,15 +218,27 @@ namespace Forever.Demos
                 {
                     if (left != right)
                     {
+                        
                         CollisionData data = ManageCollisions(detect, left, right, duration);
                         contacts.AddRange(data.contacts);
+
+
                     }
                 }
             }
 
-
             ContactResolver.FullContactResolution(contacts, duration);
+            if (this.CaptureBodyContacts)
+            {
 
+                foreach (Contact contact in contacts)
+                {
+                    if (contact.Bodies[1] != null)
+                    {
+                        captured.Add(contact);
+                    }
+                }
+            }
             if (contacts.Count > 0)
             {
                 saveLastContact(contacts[0]);
@@ -231,8 +251,8 @@ namespace Forever.Demos
         {
  
             CollisionData data = new CollisionData();
-            data.restitution = this.DefaultRestitution;
-            data.friction = this.DefaultFriction;
+            data.restitution = this.Restitution;
+            data.friction = this.Friction;
             detect.FindContacts(left.GeometryData.Prim, right.GeometryData.Prim, data);
             return data;
         }
@@ -300,6 +320,11 @@ namespace Forever.Demos
         private ModelEntity TestCube()
         {
             return MEFactory.Create(CollideType.Box, Camera.Position, DefaultSphereMass, DefaultSphereRadius);
+
+        }
+        private ModelEntity TestSphere()
+        {
+            return MEFactory.Create(CollideType.Sphere, Camera.Position, DefaultSphereMass, DefaultSphereRadius);
 
         }
         

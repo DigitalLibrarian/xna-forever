@@ -685,6 +685,7 @@ namespace Forever.Physics.Collide
                     // we multiply the direction by half the spearation distance
                     // and add the vertex location
                     Contact contact = new Contact();
+                    contact.DiscoveryHint = ContactDiscoveryHint.BoxOnPlane_Corner;
                     contact.Bodies[0] = box.Body;
                     contact.Bodies[1] = null;
                     contact.Point = plane.ClosestPoint(vert);
@@ -747,7 +748,7 @@ namespace Forever.Physics.Collide
             Vector3 closestWorld = Vector3.Transform(closest, box.Transform);
 
             Contact contact = new Contact();
-            Vector3 normal  = (center - closestWorld);
+            Vector3 normal = closestWorld - center;// (center - closestWorld);
             normal.Normalize();
             contact.Normal = normal;
             Debug.Sanity(contact.Normal);

@@ -13,7 +13,9 @@ namespace Forever.Physics.Collide
     {
         None,
         BoxOnBox_Edge_Edge,
-        BoxOnBox_Point_Face
+        BoxOnBox_Point_Face,
+        
+        BoxOnPlane_Corner
     }
 
 
@@ -265,13 +267,16 @@ namespace Forever.Physics.Collide
                 Vector3 tran = linearMove[bodyIndex] * Normal;
                 body.Position = pos + tran;
 
+                Vector3 rotation = angularChange[bodyIndex] * Normal;
+
+                
                 Quaternion q = body.Orientation;
-                Vector3 rotation = angularMove[bodyIndex] * Normal;
-
-
                 q = TrickyMath.AddVector(q, rotation);
                 body.Orientation = q;
 
+                
+
+                
                 if (!body.Awake)
                 {
 
@@ -297,7 +302,7 @@ namespace Forever.Physics.Collide
         Matrix[] inverseInertiaTensor = new Matrix[2];
 
         inverseInertiaTensor[0] = getTensorFromBody(Bodies[0]);
-        if (Bodies.Length > 1 && Bodies[1] != null)
+        if (Bodies[1] != null)
         {
             inverseInertiaTensor[1] = getTensorFromBody(Bodies[1]);
         }
@@ -324,12 +329,10 @@ namespace Forever.Physics.Collide
 
         if (Bodies[1] != null)
         {
-            impulseContactSpace *= -1f;
-            impulseWorld = Vector3.Transform(impulseContactSpace, ContactWorld);
             impulsiveTorque = Vector3.Cross(impulseWorld, this.RelativeContactPositions[1]);
 
             rotationChange[1] = Vector3.Transform(impulsiveTorque, inverseInertiaTensor[1]);
-            velocityChange[1] = impulseWorld * Bodies[1].InverseMass;
+            velocityChange[1] = impulseWorld * -Bodies[1].InverseMass;
 
             Bodies[1].addVelocity(velocityChange[1]);
             Bodies[1].addRotation(rotationChange[1]);
@@ -368,7 +371,6 @@ namespace Forever.Physics.Collide
         }
         Debug.Sanity(result);
         return result;
-        //return new Vector3(desiredDeltaVelocity, 0f, 0f); ;
         
     }
 
@@ -428,10 +430,10 @@ namespace Forever.Physics.Collide
             impulseContact.Z * impulseContact.Z
             );
 
-        // dynamic friction
+        
+        //dynamic friction
         if (planarImpulse > impulseContact.X * Friction)
         {
-            
             float x = impulseContact.X;
             float y = impulseContact.Y;
             float z = impulseContact.Z;
@@ -444,8 +446,8 @@ namespace Forever.Physics.Collide
                 + deltaVelocity.M31 * Friction * z;
 
             x = DesiredDeltaVelocity / x;
-            y *= Friction *x ;
-            z *= Friction *x ;
+            y *= Friction * x ;
+            z *= Friction * x ;
 
             impulseContact = new Vector3(x, y, z);
 

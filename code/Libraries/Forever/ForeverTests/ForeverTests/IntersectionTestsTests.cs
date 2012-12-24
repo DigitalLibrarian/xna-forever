@@ -219,7 +219,7 @@ namespace ForeverTests
 
 
         [Test]
-        public void IntersectionTests_BoxVsSphere()
+        public void IntersectionTests_BoxVsSphere_NoIntersection()
         {
             float sphereRadius = 1f;
             CollisionData data;
@@ -250,7 +250,21 @@ namespace ForeverTests
 
             Assert.AreEqual(0, contactsFound);
 
+
+        }
+
+        [Test]
+        public void IntersectionTests_BoxVsSphere_BoxFace()
+        {
             //box face intersection
+
+            float sphereRadius = 1f;
+            CollisionData data;
+            int contactsFound;
+            Contact contact1;
+
+            Forever.Physics.Collide.Sphere sphere;
+            Forever.Physics.Collide.Box box;
 
             sphere = new Sphere(
                 new NoBody(Matrix.CreateTranslation(Vector3.Up)),
@@ -258,7 +272,7 @@ namespace ForeverTests
                 sphereRadius);
 
             box = new Box(
-                new NoBody(Matrix.CreateTranslation(Vector3.Down)),
+                new NoBody(Matrix.CreateTranslation(Vector3.Down * 0.95f)),
                 Matrix.Identity,
                 new Vector3(1f, 1f, 1f));
 
@@ -270,12 +284,33 @@ namespace ForeverTests
 
             contact1 = data.contacts[0];
 
-            Assert.AreEqual(0f, contact1.Penetration);
-            Assert.AreEqual(Vector3.Zero, contact1.Point);
-            Assert.AreEqual(Vector3.Up, contact1.Normal);
-            
+            Assert.True(
+                TrickyMath.AlmostEquals(0.05f, contact1.Penetration)
+                );
 
+            Assert.True(
+                TrickyMath.CloseEnoughToBeSame(new Vector3(0f, 0.05f, 0f), contact1.Point)
+                );
+                
+            
+            Assert.AreEqual(Vector3.Down, contact1.Normal);
+            
+        }
+
+        [Test]
+        public void IntersectionTests_BoxVsSphere_BoxCorner()
+        {
             //box corner intersection
+
+
+            float sphereRadius = 1f;
+            CollisionData data;
+            int contactsFound;
+            Contact contact1;
+
+            Forever.Physics.Collide.Sphere sphere;
+            Forever.Physics.Collide.Box box;
+
 
             box = new Box(
                 new NoBody(), //box centered at origin
@@ -283,15 +318,14 @@ namespace ForeverTests
                 new Vector3(1f, 1f, 1f)
                 );
 
-
-            Vector3 piece = new Vector3(1f, 1f, 1f);
-            piece.Normalize();
+            Vector3 boxCornerPoint = new Vector3(1f, 1f, 1f);
+            Vector3 cornerDirection = new Vector3(1f, 1f, 1f);
+            cornerDirection.Normalize();
 
             sphere = new Sphere(
                 new NoBody(
                     Matrix.CreateTranslation(
-                        new Vector3(1f, 1f, 1f) //box corner
-                        + piece
+                         boxCornerPoint + (cornerDirection * sphereRadius)
                     ) 
                 ),
                 Matrix.Identity,
@@ -314,15 +348,24 @@ namespace ForeverTests
             Assert.AreEqual(new Vector3(1f, 1f, 1f), contact1.Point);
             Assert.True(
                 TrickyMath.CloseEnoughToBeSame(
-                new Vector3(0.5773503f, 0.5773503f, 0.5773503f),
+                new Vector3(-0.5773503f, -0.5773503f, -0.5773503f),
                 contact1.Normal)
                 );
 
-            
+        }
 
-
-
+        [Test]
+        public void IntersectionTests_BoxVsSphere_BoxEdge_ZeroPenetration()
+        {
             //box edge intersection
+
+            float sphereRadius = 1f;
+            CollisionData data;
+            int contactsFound;
+            Contact contact1;
+
+            Forever.Physics.Collide.Sphere sphere;
+            Forever.Physics.Collide.Box box;
 
 
             box = new Box(
@@ -356,7 +399,58 @@ namespace ForeverTests
             Assert.AreEqual(new Vector3(0f, 1f, 1f), contact1.Point);
             Assert.True(
                 TrickyMath.CloseEnoughToBeSame(
-                new Vector3(0f, 0.7071068f, 0.7071068f),
+                new Vector3(0f, -0.7071068f, -0.7071068f),
+                contact1.Normal)
+                );
+        }
+
+        [Test]
+        public void IntersectionTests_BoxVsSphere_BoxEdge_Penetration()
+        {
+            //box edge intersection
+
+            float sphereRadius = 1f;
+            CollisionData data;
+            int contactsFound;
+            Contact contact1;
+
+            Forever.Physics.Collide.Sphere sphere;
+            Forever.Physics.Collide.Box box;
+
+
+            box = new Box(
+                new NoBody(), //box centered at origin
+                Matrix.Identity,
+                new Vector3(1f, 1f, 1f)
+                );
+
+            Vector3 spherePos = new Vector3(0f, 1f, 1f);
+            spherePos.Normalize();
+            spherePos *= 0.95f;
+            spherePos = new Vector3(0f, 1f, 1f) + spherePos;
+
+            sphere = new Sphere(
+                new NoBody(
+                    Matrix.CreateTranslation(spherePos)
+                    ),
+                Matrix.Identity,
+                sphereRadius);
+            data = new CollisionData();
+
+            contactsFound = IntersectionTests.boxAndSphere(box, sphere, data);
+
+
+            Assert.AreEqual(1, contactsFound);
+            contact1 = data.contacts[0];
+
+            Assert.True(
+                TrickyMath.AlmostEquals(0.05f, contact1.Penetration)
+                );
+
+            Assert.AreEqual(new Vector3(0f, 1f, 1f), contact1.Point);
+            Assert.True(
+                TrickyMath.CloseEnoughToBeSame(
+                new Vector3(0f, -0.7071068f, -0.7071068f),
                 contact1.Normal)
                 );
         }
@@ -653,7 +747,7 @@ namespace ForeverTests
 
 
         [Test]
-        public void IntersectionTests_BoxVsBox_ZeroPenetration()
+        public void IntersectionTests_BoxVsBox_NotTouching()
         {
             Vector3 leftPos = new Vector3(-100f, -100f, -100f);
             IRigidBody leftBody = new NoBody(Matrix.CreateTranslation(leftPos));
@@ -669,6 +763,34 @@ namespace ForeverTests
 
             Assert.AreEqual(0, contactsFound);
             Assert.AreEqual(0, data.contacts.Count);
+        }
+
+        [Test]
+        public void IntersectionTests_BoxVsBox_Faces()
+        {
+            NoBody topBody = new NoBody(Matrix.CreateTranslation(new Vector3(1.5f, 2.0f, 0.25f)));
+
+            Box top = new Box(
+                topBody,
+                Matrix.Identity,
+                new Vector3(1f, 1f, 1f));
+
+            NoBody bottomBody = 
+                new NoBody(Matrix.CreateTranslation(new Vector3(0f, 0f, 0f)));
+            Box bottom = new Box(
+                bottomBody,
+                Matrix.Identity,
+                new Vector3(1f, 1f, 1f));
+
+            CollisionData data = new CollisionData();
+            int contactsFound = IntersectionTests.boxAndBox(top, bottom, data);
+
+            Assert.AreEqual(1, contactsFound);
+
+            Contact contact = data.contacts[0];
+            Assert.AreEqual(new Vector3(1f, 1f, 1f), contact.Point);
+            Assert.AreEqual(Vector3.Up, contact.Normal);
+            Assert.AreEqual(0f, contact.Penetration);
         }
 
 

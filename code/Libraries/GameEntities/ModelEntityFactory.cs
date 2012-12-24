@@ -92,8 +92,9 @@ namespace Forever.GameEntities
             Box prim = new Box(body, Matrix.Identity, new Vector3(halfSize, halfSize, halfSize));
             EntityGeometryData geoData = new EntityGeometryData();
             geoData.Prim = prim;
-            geoData.BoundingSphere = new BoundingSphere(Vector3.Zero, halfSize);
 
+            geoData.BoundingSphere = new BoundingSphere(Vector3.Zero, halfSize);
+            geoData.BoundingSphere = Forever.Physics.Collide.PrimitiveHelper.ModelBoundingSphere(model);
             return new ModelEntity(model, body, geoData);
         }
 

@@ -76,6 +76,7 @@ namespace Forever
             return (float)Math.Sqrt(f);
         }
 
+
         public static float ScalarProduct(Vector3 v1, Vector3 v2)
         {
             return Vector3.Dot(v1, v2);
@@ -90,20 +91,35 @@ namespace Forever
 
         public static Quaternion AddVector(Quaternion addee, Vector3 vector)
         {
+            /*
+            Vector3 angularVelocity = vector;
+            Quaternion spin = (new Quaternion(angularVelocity.X, angularVelocity.Y, angularVelocity.Z, 0f) * 0.5f);
 
-            Quaternion q = Quaternion.Concatenate(
-                addee,
+            if (spin.Length() > 0)
+            {
+                addee += Quaternion.Concatenate(addee, spin);
+            }
+            
+            return addee;
+            */
+
+            Quaternion q = //Quaternion.Concatenate(
+               //addee,
                 new Quaternion(
                     vector.X,
                     vector.Y,
-                    vector.Z, 0f)
+                    vector.Z,
+                    0f//)
             );
 
-            float r = q.W * q.W * (0.5f);
-            float x = q.X * q.X * (0.5f);
-            float y = q.Y * q.Y * (0.5f);
-            float z = q.Z * q.Z * (0.5f);
-            return new Quaternion(x, y, z, r);
+
+            q *= addee;
+
+            float w = addee.W + (q.W * (0.5f));
+            float x = addee.X + (q.X * (0.5f));
+            float y = addee.Y + (q.Y * (0.5f));
+            float z = addee.Z + (q.Z * (0.5f));
+            return new Quaternion(x, y, z, w);
         }
 
         public static bool AlmostEquals(float f1, float f2, float precision = 0.025f)

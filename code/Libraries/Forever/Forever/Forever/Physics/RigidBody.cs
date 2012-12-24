@@ -13,7 +13,7 @@ namespace Forever.Physics
   public class RigidBody : IRigidBody
   {
 
-      private const float SleepEpsilon = 0.000027f;
+      private const float SleepEpsilon = 0.0005f;//0.000027f;
       private const double BaseOfMotionTrackingBias = 0.99f;
 
       #region Body Space Basis
@@ -126,8 +126,7 @@ namespace Forever.Physics
     {
         get { return _inverse_inertia_tensor_world; }
     }
-    public float LinearDamping { get { return _linear_damping; } set { 
-        _linear_damping = value; } }
+    public float LinearDamping { get { return _linear_damping; } set { _linear_damping = value; } }
     public float AngularDamping { get { return _angular_damping; } set { _angular_damping = value;} }
 
 
@@ -166,7 +165,7 @@ namespace Forever.Physics
             if (value)
             {
                 _awake = true;
-                _motion = float.MaxValue;
+                primeMotion();
             }
             else 
             {
@@ -177,21 +176,30 @@ namespace Forever.Physics
         } 
     }
 
+   
+
     public bool CanSleep { get; set; }
 
     public Matrix World { get { return _transform_matrix; } }
+
+
+    private void primeMotion()
+    {
+        _motion = float.MaxValue;
+    }
 
 
     public void addVelocity(Vector3 velo)
     {
         Debug.Sanity(velo);
         this._velocity += velo;
+        
     }
     public void addRotation(Vector3 rot)
     {
         Debug.Sanity(rot);
         this._rotation += rot;
-       
+        
     }
 
 #endregion
@@ -201,7 +209,7 @@ namespace Forever.Physics
     {
       this._awake = true;
       this.CanSleep = true;
-      this._motion = float.MaxValue;
+      
       this.SmallestPositiveMotion = float.MaxValue;
       this._position = pos;
       this._velocity = Vector3.Zero;
@@ -210,7 +218,8 @@ namespace Forever.Physics
       this._transform_matrix = Matrix.Identity;
       this._inverse_inertia_tensor_world = Matrix.Identity;
       this._inverse_inertia_tensor = Matrix.Identity;
-      this._motion = float.MaxValue;
+
+      primeMotion();
       clearAccumulators();
       calculateDerivedData();
       
@@ -277,15 +286,19 @@ namespace Forever.Physics
 
 
         // Push the orientation quaternion ahead by the rotation (angular speed) vector
-        Vector3 angularVelocity = _rotation;
+        Vector3 angularVelocity = _rotation * duration;
+
+        Orientation = TrickyMath.AddVector(Orientation, angularVelocity);
+        /*
         Quaternion spin = (new Quaternion(angularVelocity.X, angularVelocity.Y, angularVelocity.Z, 0f) * 0.5f);
 
         if (spin.Length() > 0)
         {
             Orientation += Quaternion.Concatenate(Orientation, spin);
         }
+        
         Orientation.Normalize();
-
+        */
         
         Debug.Sanity(_orientation);
 
@@ -297,6 +310,7 @@ namespace Forever.Physics
 
     private void trySleep(float duration)
     {
+        //return;
         if (CanSleep && Awake)
         {
             float currentMotion = TrickyMath.ScalarProduct(Velocity, Velocity) + TrickyMath.ScalarProduct(Rotation, Rotation);
@@ -313,9 +327,9 @@ namespace Forever.Physics
                 _awake = false;
                 _motion = 0;
             }
-            else if (newMotion > 100 * SleepEpsilon)
+            else if (newMotion > 10 * SleepEpsilon)
             {
-                _motion = 100 * SleepEpsilon;
+                _motion = 10 * SleepEpsilon;
             }
 
             _motion = newMotion;
@@ -349,6 +363,7 @@ namespace Forever.Physics
       Debug.Sanity(_torque_accum);
 
       this.addForce(force);
+      
     }
     public void addTorque(Vector3 torque)
     {

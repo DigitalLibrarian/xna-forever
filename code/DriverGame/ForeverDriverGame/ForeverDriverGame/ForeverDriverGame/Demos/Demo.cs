@@ -264,6 +264,8 @@ namespace Forever.Demos
             midLine *= forceMag;
             left.addForce(-midLine);
             right.addForce(midLine);
+            left.Body.Awake = true;
+            right.Body.Awake = true;
         }
         public void PushApart(ModelEntity left, ModelEntity right, float forceMag)
         {
