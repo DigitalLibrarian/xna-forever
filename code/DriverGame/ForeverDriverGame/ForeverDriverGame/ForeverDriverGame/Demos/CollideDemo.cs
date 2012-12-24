@@ -12,6 +12,7 @@ using Forever.Interface;
 using Forever.GameEntities;
 
 using Forever.Demos.Components.SkyDome;
+using Forever.Demos.Components.Guns;
 
 namespace Forever.Demos
 {
@@ -41,6 +42,8 @@ namespace Forever.Demos
 
         List<Contact> captured = new List<Contact>();
         public bool CaptureBodyContacts { get; set; }
+
+        public CameraGun UserGun { get; set; }
 
         #region Constructors
         public CollideDemo()
@@ -76,6 +79,7 @@ namespace Forever.Demos
            
             LastContact = new Contact();
 
+
         }
 
         public static CollideDemo SphereOnSphere()
@@ -105,6 +109,9 @@ namespace Forever.Demos
         public override void LoadContent()
         {
             base.LoadContent();
+
+            UserGun = new EntityInspectorScreenGun(this.ScreenManager);
+            UserGun.LoadContent(this.Content);
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
             EntityTwo = MEFactory.Create(primTwoCollideType, DefaultSpawnPosTwo, DefaultSphereMass, DefaultSphereRadius);
@@ -194,6 +201,12 @@ namespace Forever.Demos
             }
         }
 
+        public override void Draw(GameTime gameTime)
+        {
+            base.Draw(gameTime);
+            UserGun.SpriteBatch = this.ScreenManager.SpriteBatch;
+            UserGun.Render(RenderContext, gameTime);
+        }
         
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
@@ -201,6 +214,12 @@ namespace Forever.Demos
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
             PumpCollisions((float)gameTime.ElapsedGameTime.Milliseconds);
             SkyDome.Update();
+
+            UserGun.Update(gameTime, this.ICollideables, this.Camera);
+            if (this.CamControls.Firing)
+            {
+                UserGun.Fire();
+            }
         }
 
         private void PumpCollisions(float duration)

@@ -12,6 +12,6 @@ namespace Forever.Interface
   public interface IRenderable
   {
     void LoadContent(ContentManager content);
-    void Render(RenderContext render_context, GameTime gameTime);
+    void Render(RenderContext renderContext, GameTime gameTime);
   }
 }

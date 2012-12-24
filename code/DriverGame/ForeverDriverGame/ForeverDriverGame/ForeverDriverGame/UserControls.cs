@@ -26,7 +26,9 @@ namespace Forever.Demos
         RollRight,
         RollLeft,
 
-        Shifter
+        Shifter,
+
+        Firing
     };
 
     public class UserControls 
@@ -50,7 +52,7 @@ namespace Forever.Demos
         [EntityInspector("TorqueShiftMag - needs unit test!!")]
         public float TorqueShiftMag { get; set; }
 
-
+        public bool Firing { get; set; }
 
         public PlayerIndex playerIndex;
         public Dictionary<Keys, UserControlKeys> KeyMappings = new Dictionary<Keys, UserControlKeys>();
@@ -83,6 +85,8 @@ namespace Forever.Demos
 
             KeyMappings[Keys.LeftShift] = UserControlKeys.Shifter;
             KeyMappings[Keys.RightShift] = UserControlKeys.Shifter;
+
+            KeyMappings[Keys.Space] = UserControlKeys.Firing;
         }
 
 
@@ -91,6 +95,7 @@ namespace Forever.Demos
             Vector3 newTrans = Vector3.Zero;
             Vector3 newRot = Vector3.Zero;
             bool shift = false;
+            bool firing = false;
             foreach (KeyValuePair<Keys, UserControlKeys> pair in KeyMappings)
             {
                 Keys key = pair.Key;
@@ -138,6 +143,9 @@ namespace Forever.Demos
                         case UserControlKeys.Shifter:
                             shift = true;
                             break;
+                        case UserControlKeys.Firing:
+                            firing = true;
+                            break;
                     }
                 }
             }
@@ -154,6 +162,8 @@ namespace Forever.Demos
                 torque.Normalize();
                 torque *= shift ? TorqueShiftMag : TorqueMag;
             }
+
+            Firing = firing;
         }
 
 

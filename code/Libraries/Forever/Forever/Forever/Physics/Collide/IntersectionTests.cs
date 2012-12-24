@@ -11,8 +11,6 @@ namespace Forever.Physics.Collide
     public static class IntersectionTests
     {
 
-
-
         //dispatch
         public static int primAndPrim(Primitive one, Primitive two, CollisionData data)
         {

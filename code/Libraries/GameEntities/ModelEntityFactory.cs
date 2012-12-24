@@ -22,6 +22,7 @@ namespace Forever.GameEntities
         public float LinearDamping { get; set; }
         public float AngularDamping { get; set; }
 
+
         public ModelEntityFactory()
         {
             LinearDamping = 0.99997f;
@@ -93,8 +94,8 @@ namespace Forever.GameEntities
             EntityGeometryData geoData = new EntityGeometryData();
             geoData.Prim = prim;
 
-            geoData.BoundingSphere = new BoundingSphere(Vector3.Zero, halfSize);
-            geoData.BoundingSphere = Forever.Physics.Collide.PrimitiveHelper.ModelBoundingSphere(model);
+            geoData.BoundingSphere = new BoundingSphere(Vector3.Zero, halfSize * TrickyMath.Sqrt(2f));
+           
             return new ModelEntity(model, body, geoData);
         }
 

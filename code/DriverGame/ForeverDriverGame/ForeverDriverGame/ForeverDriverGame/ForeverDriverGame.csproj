@@ -110,6 +110,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Guns\CameraGun.cs" />
+    <Compile Include="Components\Guns\EntityInspectorScreenGun.cs" />
     <Compile Include="Components\SkyDome\SkyDome.cs" />
     <Compile Include="Components\SkyDome\SkyDomeParameters.cs" />
     <Compile Include="Demos\BallDemo.cs" />
