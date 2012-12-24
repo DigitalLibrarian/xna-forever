@@ -110,7 +110,8 @@ namespace Forever.Demos
         {
             base.LoadContent();
 
-            UserGun = new EntityInspectorScreenGun(this.ScreenManager);
+            //UserGun = new EntityInspectorScreenGun(this.ScreenManager);
+            UserGun = new ForceGun(Vector3.Forward * 0.00001f);
             UserGun.LoadContent(this.Content);
             
             EntityOne = MEFactory.Create(primOneCollideType, DefaultSpawnPosOne, DefaultSphereMass, DefaultSphereRadius);
@@ -212,15 +213,26 @@ namespace Forever.Demos
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+
             PumpCollisions((float)gameTime.ElapsedGameTime.Milliseconds);
             SkyDome.Update();
 
             UserGun.Update(gameTime, this.ICollideables, this.Camera);
-            if (this.CamControls.Firing)
+            
+            if (this.CamControls.PrimaryFire)
             {
-                UserGun.Fire();
+                UserGun.Fire(  FiringType.Primary);
             }
+
+            if (this.CamControls.SecondaryFire)
+            {
+                UserGun.Fire(FiringType.Secondary);
+            }
+
         }
+
+       
 
         private void PumpCollisions(float duration)
         {

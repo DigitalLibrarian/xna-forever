@@ -24,9 +24,9 @@ namespace Forever.Demos.Components.Guns
             ScreenManager = screenManager;
         }
 
-        public override void Fire()
+        public override void Fire(FiringType firingType)
         {
-            base.Fire();
+            base.Fire(firingType);
 
             if (Screen != null)
             {

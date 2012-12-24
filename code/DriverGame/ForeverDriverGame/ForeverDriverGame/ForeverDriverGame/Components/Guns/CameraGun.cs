@@ -13,6 +13,9 @@ using Forever.Render;
 
 namespace Forever.Demos.Components.Guns
 {
+
+    public enum FiringType { Primary, Secondary };
+
     public abstract class CameraGun : IRenderable 
     {
         public SpriteBatch SpriteBatch { get; set; }
@@ -28,18 +31,15 @@ namespace Forever.Demos.Components.Guns
         protected Color ReticuleColor { get; set; }
 
 
-        public void Update(GameTime gameTime, List<ICollideable> collider, ICamera camera)
+        public virtual void Update(GameTime gameTime, List<ICollideable> gameObjects, ICamera camera)
         {
             Ray  = new Ray(camera.Position, camera.Forward);
             Target = null;
 
-            foreach (ICollideable gameObject in collider)
+            foreach (ICollideable gameObject in gameObjects)
             {
-                BoundingSphere sphere = gameObject.GeometryData.BoundingSphere;
-                sphere = sphere.Transform(gameObject.GeometryData.Prim.Transform);
-
-                float? penetration = Ray.Intersects(sphere);
-                if (penetration != null && penetration > 0)
+                float? dist = this.DistanceToIntersect(Ray, gameObject);
+                if (dist != null && dist > 0)
                 {
                     Target = gameObject;
                     break;
@@ -47,7 +47,16 @@ namespace Forever.Demos.Components.Guns
             }
         }
 
-        public void LoadContent(ContentManager content)
+        protected float? DistanceToIntersect(Ray ray, ICollideable gameObject)
+        {
+
+            BoundingSphere sphere = gameObject.GeometryData.BoundingSphere;
+            sphere = sphere.Transform(gameObject.GeometryData.Prim.Transform);
+
+            return  Ray.Intersects(sphere);
+        }
+
+        public virtual void LoadContent(ContentManager content)
         {
             string textureName = "crosshair";
             ReticuleTexture = content.Load<Texture2D>(textureName);
@@ -56,7 +65,7 @@ namespace Forever.Demos.Components.Guns
         }
 
 
-        public void Render(RenderContext renderContext, GameTime gameTime)
+        public virtual void Render(RenderContext renderContext, GameTime gameTime)
         {
             if (SpriteBatch == null)
             {
@@ -86,7 +95,7 @@ namespace Forever.Demos.Components.Guns
         }
 
 
-        public virtual void Fire(){}
+        public virtual void Fire(FiringType firingType){}
 
     }
 }

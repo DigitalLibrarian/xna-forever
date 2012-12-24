@@ -28,7 +28,8 @@ namespace Forever.Demos
 
         Shifter,
 
-        Firing
+        PrimaryFire,
+        SecondaryFire
     };
 
     public class UserControls 
@@ -52,7 +53,8 @@ namespace Forever.Demos
         [EntityInspector("TorqueShiftMag - needs unit test!!")]
         public float TorqueShiftMag { get; set; }
 
-        public bool Firing { get; set; }
+        public bool PrimaryFire { get; set; }
+        public bool SecondaryFire { get; set; }
 
         public PlayerIndex playerIndex;
         public Dictionary<Keys, UserControlKeys> KeyMappings = new Dictionary<Keys, UserControlKeys>();
@@ -86,7 +88,8 @@ namespace Forever.Demos
             KeyMappings[Keys.LeftShift] = UserControlKeys.Shifter;
             KeyMappings[Keys.RightShift] = UserControlKeys.Shifter;
 
-            KeyMappings[Keys.Space] = UserControlKeys.Firing;
+            KeyMappings[Keys.LeftAlt] = UserControlKeys.PrimaryFire;
+            KeyMappings[Keys.RightAlt] = UserControlKeys.SecondaryFire;
         }
 
 
@@ -95,7 +98,8 @@ namespace Forever.Demos
             Vector3 newTrans = Vector3.Zero;
             Vector3 newRot = Vector3.Zero;
             bool shift = false;
-            bool firing = false;
+            bool primaryFire = false;
+            bool secondaryFire = false;
             foreach (KeyValuePair<Keys, UserControlKeys> pair in KeyMappings)
             {
                 Keys key = pair.Key;
@@ -143,8 +147,11 @@ namespace Forever.Demos
                         case UserControlKeys.Shifter:
                             shift = true;
                             break;
-                        case UserControlKeys.Firing:
-                            firing = true;
+                        case UserControlKeys.PrimaryFire:
+                            primaryFire = true;
+                            break;
+                        case UserControlKeys.SecondaryFire:
+                            secondaryFire = true;
                             break;
                     }
                 }
@@ -162,8 +169,9 @@ namespace Forever.Demos
                 torque.Normalize();
                 torque *= shift ? TorqueShiftMag : TorqueMag;
             }
-
-            Firing = firing;
+            PrimaryFire = primaryFire;
+            SecondaryFire = secondaryFire;
+            
         }
 
 
